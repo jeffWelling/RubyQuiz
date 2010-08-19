@@ -39,8 +39,15 @@ class Cell
 		@borders-=2 if (@borders!=0 and @borders.even?)
 	end
 	
+  def add_reverse_neighbor original_direction, neighbor
+    direction = {:east => :west, :west => :east, :north => :south, :south => :north}[original_direction]
+    @neighbors[direction]=neighbor
+  end
+  protected :add_reverse_neighbor
+
 	def add_neighbor direction, neighbor
 		@neighbors[direction]=neighbor
+    neighbor.add_reverse_neighbor direction, self
 	end
 
 	def del_neighbor direction
