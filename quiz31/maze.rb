@@ -3,6 +3,7 @@ class Cell
 	def initialize borders=nil, walls=nil
 		@borders= ( borders.nil? ? 0 : borders )
 		@walls= (walls.nil? ? 0 : walls)
+		@neighbors={}
 	end
 
 	def set_north_wall
@@ -35,6 +36,14 @@ class Cell
 
 	def unset_west_border
 		@borders-=2 if @borders.even?
+	end
+	
+	def add_neighbor direction, neighbor
+		@neighbor[direction]=neighbor
+	end
+
+	def del_neighbor direction
+		@neighbor[direction]=nil
 	end
 
 	def dump
