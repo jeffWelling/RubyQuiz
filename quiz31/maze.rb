@@ -62,18 +62,9 @@ class Maze
 		(0...length).each {|l|
 			@board[l] ||=[]
 			(0...width).each{|w|
-				@board[l][w]||=nil
 				@board[l][w]=cell=Cell.new
-				next if l==0 and w==0
-				if l==0
-					#don't link to the one above, it doesn't exist
-					@board[l][w-1].add_neighbor :east, cell
-				elsif w==0
-					@board[l-1][w].add_neighbor :south, cell
-				else
-					@board[l-1][w].add_neighbor :south, cell
-					@board[l][w-1].add_neighbor :east, cell
-				end
+        @board[l-1][w].add_neighbor(:south, cell) unless l == 0
+				@board[l][w-1].add_neighbor(:east,  cell) unless w == 0
 			}
 		}
     set_borders
