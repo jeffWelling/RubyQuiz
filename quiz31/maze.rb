@@ -79,6 +79,13 @@ class Maze
 				end
 			}
 		}
+    set_borders
 		@board
 	end
+  attr_accessor :board
+  
+  def set_borders
+    (0..board.length-1).each do |l| board[l][0].set_west_border end
+    (0..board[0].length-1).each do |w| board[0][w].set_north_border end
+  end
 end
