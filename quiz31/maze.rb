@@ -41,6 +41,13 @@ class Cell
 		[@neighbors,@walls]
 	end
 
+  def to_s
+    "#{@neighbors.length} neighbors - #{@walls.inspect}"
+  end
+
+  def inspect
+    "Cell(##{object_id.to_s(16)} #{to_s}"
+  end
 end
 
 class Maze
