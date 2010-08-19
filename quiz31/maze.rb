@@ -24,19 +24,19 @@ class Cell
 	end
 
 	def set_west_wall
-		@walls+=2 unless @walls.even?
+		@walls+=2 unless (@walls!=0 and @walls.even?)
 	end
 
 	def unset_west_wall
-		@walls-=2 if @walls.even?
+		@walls-=2 if (@walls!=0 and @walls.even?)
 	end
 
 	def set_west_border
-		@borders+=2 unless @borders.even?
+		@borders+=2 unless (@borders != 0 and @borders.even?)
 	end
 
 	def unset_west_border
-		@borders-=2 if @borders.even?
+		@borders-=2 if (@borders!=0 and @borders.even?)
 	end
 	
 	def add_neighbor direction, neighbor
