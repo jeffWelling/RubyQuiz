@@ -1,6 +1,5 @@
 class Cell
-	def initialize borders=nil, walls=nil
-		@borders= ( borders.nil? ? 0 : borders )
+	def initialize walls=nil
 		@walls= (walls.nil? ? 3 : walls)
 		@neighbors={:north=>nil, :east=>nil, :south=>nil, :west=>nil}
 	end
@@ -15,14 +14,6 @@ class Cell
 		@walls-=1 if @walls.odd?
 	end
 
-	def set_north_border
-		@borders+=1 unless @borders.odd?
-	end
-
-	def unset_north_border
-		@borders-=1 if @borders.odd?
-	end
-
 	def set_west_wall
 		@walls+=2 unless (@walls!=0 and @walls.even?)
 	end
@@ -31,14 +22,6 @@ class Cell
 		@walls-=2 if (@walls!=0 and @walls.even?)
 	end
 
-	def set_west_border
-		@borders+=2 unless (@borders != 0 and @borders.even?)
-	end
-
-	def unset_west_border
-		@borders-=2 if (@borders!=0 and @borders.even?)
-	end
-	
   def add_reverse_neighbor original_direction, neighbor
     direction = {:east => :west, :west => :east, :north => :south, :south => :north}[original_direction]
     @neighbors[direction]=neighbor
@@ -55,7 +38,7 @@ class Cell
 	end
 
 	def dump
-		[@borders,@walls]
+		[@neighbors,@walls]
 	end
 
 end
@@ -74,13 +57,7 @@ class Maze
 				@board[l][w-1].add_neighbor(:east,  cell) unless w == 0
 			}
 		}
-    set_borders
 		@board
 	end
   attr_accessor :board
-  
-  def set_borders
-    (0..board.length-1).each do |l| board[l][0].set_west_border end
-    (0..board[0].length-1).each do |w| board[0][w].set_north_border end
-  end
 end
