@@ -56,15 +56,12 @@ end
 class Maze
 	def initialize length, width
 		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
-		#to compensate for starting from zero
-		length-=1
-		width-=1
 
 		first_cell=nil
 		@board=[[]]
-		(0..length).each {|l|
+		(0...length).each {|l|
 			@board[l] ||=[]
-			(0..width).each{|w|
+			(0...width).each{|w|
 				@board[l][w]||=nil
 				@board[l][w]=cell=Cell.new
 				next if l==0 and w==0
