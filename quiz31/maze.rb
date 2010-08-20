@@ -121,7 +121,7 @@ class Maze
 
   def display
     board.each {|cells|
-      rows = cells.inject([[],[],[]]) {|rows, cell|
+      rows = cells.inject([]) {|rows, cell|
         output = cell.display
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
