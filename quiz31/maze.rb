@@ -52,6 +52,14 @@ class Cell
 		[@neighbors, @walls].each {|h| h.delete direction }
 	end
 
+  def unvisited?
+    walls.all? {|dir,wall| wall }
+  end
+
+  def unvisited_neighbors
+    neighbors.select {|dir,cell| cell.unvisited? }
+  end
+
 	def dump
 		[@neighbors,@walls]
 	end
