@@ -1,7 +1,8 @@
 class Cell
+  
 	def initialize walls=nil
 		@walls= (walls.nil? ? 3 : walls)
-		@neighbors={:north=>nil, :east=>nil, :south=>nil, :west=>nil}
+		@neighbors= {}
 	end
 
 	attr_accessor :neighbors
@@ -23,7 +24,8 @@ class Cell
 	end
 
   def add_reverse_neighbor original_direction, neighbor
-    direction = {:east => :west, :west => :east, :north => :south, :south => :north}[original_direction]
+    directions = {:east => :west, :west => :east, :north => :south, :south => :north}
+    direction  = directions[original_direction] || "reverse_of_#{original_direction}".to_sym
     @neighbors[direction]=neighbor
   end
   protected :add_reverse_neighbor
