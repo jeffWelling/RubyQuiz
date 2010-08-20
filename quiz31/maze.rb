@@ -5,7 +5,7 @@ class Cell
 		@neighbors= {}
 	end
 
-	attr_accessor :neighbors
+	attr_reader :neighbors, :walls
 
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
@@ -67,6 +67,7 @@ end
 
 class Maze
 	def initialize length, width
+    @length, @width = length, width
 		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
 
 		first_cell=nil
@@ -81,5 +82,5 @@ class Maze
 		}
 		@board
 	end
-  attr_accessor :board
+  attr_reader :board, :length, :width
 end
