@@ -64,7 +64,7 @@ class Cell
   end
 
   def not_walked_on_neighbors
-    neighbors.select {|dir,cell| !cell.walked_on }
+    neighbors.select {|dir,cell| self.passable?(dir) and !cell.walked_on }
   end
 
 	def dump
