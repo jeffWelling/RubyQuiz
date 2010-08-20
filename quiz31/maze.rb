@@ -1,26 +1,26 @@
 class Cell
   
 	def initialize walls=nil
-		@walls= (walls.nil? ? 3 : walls)
+		@walls= {}
 		@neighbors= {}
 	end
 
 	attr_accessor :neighbors
 
 	def set_north_wall
-		@walls+=1 unless @walls.odd?
+    @walls[:north] = true
 	end
 
 	def unset_north_wall
-		@walls-=1 if @walls.odd?
+    @walls[:north] = false
 	end
 
 	def set_west_wall
-		@walls+=2 unless (@walls!=0 and @walls.even?)
+    @walls[:west] = true
 	end
 
 	def unset_west_wall
-		@walls-=2 if (@walls!=0 and @walls.even?)
+    @walls[:west] = false
 	end
 
   def add_reverse_neighbor original_direction, neighbor
