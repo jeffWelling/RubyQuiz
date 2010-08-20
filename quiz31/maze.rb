@@ -124,7 +124,7 @@ class Maze
     list=[starting_cell]
     begin
       cell=list.last
-      neighbors= eval( "cell.#{get_neighbors}" )
+      neighbors= cell.send(get_neighbors.to_sym)
       if neighbors.empty?
         list.pop
       else
