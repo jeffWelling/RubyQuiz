@@ -125,6 +125,7 @@ class Maze
       }
       puts rows.collect {|row| row.join }
     }
+    nil
   end
   attr_reader :board, :length, :width
 end
