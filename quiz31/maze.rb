@@ -88,7 +88,6 @@ class Maze
     @length, @width = length, width
 		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
 
-		first_cell=nil
 		@board=[[]]
 		(0...length).each {|l|
 			@board[l] ||=[]
@@ -100,6 +99,22 @@ class Maze
 		}
 		@board
 	end
+
+  def generate
+    l, w = rand(length), rand(width)
+    list = [ board[l][w] ]
+    begin
+      cell = list.last
+      unvisited = cell.unvisited_neighbors
+      if unvisited.empty?
+        list.pop
+      else
+        dir, other = unvisited.random
+        cell.unset_wall dir
+        list << other
+      end
+    end while !list.empty?
+  end
 
   def display
     board.each {|cells|
