@@ -108,6 +108,14 @@ class Maze
     l, w = rand(length), rand(width)
     crawl( board[l][w] ) {|cell,dir| cell.unset_wall dir }
   end
+  def solve
+    cell=board[0][0]
+    crawl( cell ) {|cell, dir|
+      #This should return cell if cell is in the bottom right corner of the board
+      return cell if cell==board[ board.length ][ board[0].length ]
+      cell.walk_on
+    }
+  end
   def crawl(starting_cell)
     list=[starting_cell]
     begin
