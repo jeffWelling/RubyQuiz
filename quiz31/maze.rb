@@ -7,20 +7,14 @@ class Cell
 
 	attr_accessor :neighbors
 
-	def set_north_wall
-    @walls[:north] = true
+	def set_wall direction, state = true, both = true
+    direction = direction.to_sym
+    neighbors[direction].set_wall reverse_dir(direction), false, state if both
+    @walls[direction] = state
 	end
 
-	def unset_north_wall
-    @walls[:north] = false
-	end
-
-	def set_west_wall
-    @walls[:west] = true
-	end
-
-	def unset_west_wall
-    @walls[:west] = false
+	def unset_wall direction, both = true
+    set_wall direction, both, false
 	end
 
   def reverse_dir direction
