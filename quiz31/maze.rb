@@ -83,7 +83,7 @@ class Cell
       [west, (walked_on==true ? '.' : ' ')] ]
   end
   def walk_on
-    walked_on=true
+    @walked_on=true
   end
 end
 
