@@ -116,7 +116,7 @@ class Maze
     cell=board[0][0]
     crawl( cell, 'not_walked_on_neighbors' ) {|cell, dir|
       #This should return cell if cell is in the bottom right corner of the board
-      return cell if cell==board[ board.length ][ board[0].length ]
+      return cell if cell==board[ board.length-1 ][ board[0].length-1 ]
       cell.walk_on
     }
   end
