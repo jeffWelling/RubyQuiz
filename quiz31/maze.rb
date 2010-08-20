@@ -100,5 +100,16 @@ class Maze
 		}
 		@board
 	end
+
+  def display
+    board.each {|cells|
+      rows = cells.inject([[],[],[]]) {|rows, cell|
+        output = cell.display
+        output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
+        rows
+      }
+      puts rows.collect {|row| row.join }
+    }
+  end
   attr_reader :board, :length, :width
 end
