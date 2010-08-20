@@ -119,6 +119,20 @@ class Maze
       end
     end while !list.empty?
   end
+  def crawl(starting_cell)
+    list=[starting_cell]
+    begin
+      cell=list.last
+      unvisited= cell.unvisited_neighbors
+      if unvisited.empty?
+        list.pop
+      else
+        dir, other = unvisited.random
+        yield cell, dir
+        list << other
+      end
+    end while !list.empty?
+  end
 
   def display
     pad_char = '#' ; pad = pad_char * (width * 2 + 1)
