@@ -5,9 +5,10 @@ class Cell
 	def initialize walls=nil
 		@walls= {}
 		@neighbors= {}
+    @walked_on=false
 	end
 
-	attr_reader :neighbors, :walls
+	attr_reader :neighbors, :walls, :walked_on 
 
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
@@ -81,6 +82,8 @@ class Cell
     [ [w,   north],
       [west, ' '] ]
   end
+  def walk_on
+    walked
 end
 
 class Maze
