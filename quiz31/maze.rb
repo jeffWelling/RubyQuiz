@@ -23,21 +23,32 @@ class Cell
     @walls[:west] = false
 	end
 
-  def add_reverse_neighbor original_direction, neighbor
-    directions  = [%w(west east), %w(north south), %w(up down), %w(out in)].collect {|a| a.collect &:to_sym }
-    reverse_map = directions.inject({}) {|h,a| h[a.first] = a.last ; h[a.last] = a.first ; h }
-    direction   = reverse_map[original_direction.to_sym] || "reverse_of_#{original_direction}".to_sym
-    @neighbors[direction]=neighbor
+  def reverse_dir direction
+    direction = direction.to_sym
+    @reverse_map ||= begin
+      directions = [%w(east west), %w(north south), %w(up down), %w(in out)].collect {|a| a.collect &:to_sym }
+      directions.inject({}) {|h,a| h[a.first] = a.last ; h[a.last] = a.first ; h }
+    end
+    @reverse_map[direction] || "reverse_of_#{direction}".to_sym
   end
-  protected :add_reverse_neighbor
 
-	def add_neighbor direction, neighbor
-		@neighbors[direction]=neighbor
-    neighbor.add_reverse_neighbor direction, self
+	def add_neighbor direction, neighbor, reverse = false
+    direction = direction.to_sym
+    neighbor.add_neighbor direction, self, true unless reverse
+    direction = reverse_dir(direction) if reverse
+		@neighbors[direction] = neighbor
+    @walls[direction]     = true
 	end
 
-	def del_neighbor direction
-		@neighbors[direction]=nil
+	def del_neighbor direction, reverse = false
+    direction = direction.to_sym
+    if reverse
+      direction = reverse_dir(direction)
+    else
+      raise "No such neighbor - #{direction} from #{inspect}" unless @neighbors[direction]
+      @neighbors[direction].del_neighbor direction, true
+    end
+		[@neighbors, @walls].each {|h| h.delete direction }
 	end
 
 	def dump
