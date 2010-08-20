@@ -14,7 +14,7 @@ class Cell
 	end
 
 	def unset_wall direction, both = true
-    set_wall direction, both, false
+    set_wall direction, false, both
 	end
 
   def passable? direction, both = false
