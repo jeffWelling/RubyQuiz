@@ -63,6 +63,16 @@ class Cell
   def inspect
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
+
+  def display
+    north = (walls.member?(:north) && passable?(:north, false)) ? '|' : ' '
+    south = (walls.member?(:south) && passable?(:south, false)) ? '|' : ' '
+    east  = (walls.member?(:east ) && passable?(:east , false)) ? '-' : ' '
+    west  = (walls.member?(:west ) && passable?(:west , false)) ? '-' : ' '
+    [ [' ', north, ' '],
+      [west, '+', east],
+      [' ', south, ' '] ]
+  end
 end
 
 class Maze
