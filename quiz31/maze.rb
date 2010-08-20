@@ -76,12 +76,12 @@ class Cell
 
   def display
     w = '#' # wall character
-    north = (walls.member?(:north) && passable?(:north, false)) ? '|' : w
-    south = (walls.member?(:south) && passable?(:south, false)) ? '|' : w
-    east  = (walls.member?(:east ) && passable?(:east , false)) ? '-' : w
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? '-' : w
+    north = (walls.member?(:north) && passable?(:north, false)) ? ' ' : w
+    south = (walls.member?(:south) && passable?(:south, false)) ? ' ' : w
+    east  = (walls.member?(:east ) && passable?(:east , false)) ? ' ' : w
+    west  = (walls.member?(:west ) && passable?(:west , false)) ? ' ' : w
     [ [w,   north,   w],
-      [west, '+', east],
+      [west, ' ', east],
       [w,   south,   w] ]
   end
 end
