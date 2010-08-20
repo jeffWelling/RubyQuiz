@@ -83,7 +83,8 @@ class Cell
       [west, ' '] ]
   end
   def walk_on
-    walked
+    walked_on=true
+  end
 end
 
 class Maze
