@@ -24,8 +24,9 @@ class Cell
 	end
 
   def add_reverse_neighbor original_direction, neighbor
-    directions = {:east => :west, :west => :east, :north => :south, :south => :north}
-    direction  = directions[original_direction] || "reverse_of_#{original_direction}".to_sym
+    directions  = [%w(west east), %w(north south), %w(up down), %w(out in)].collect {|a| a.collect &:to_sym }
+    reverse_map = directions.inject({}) {|h,a| h[a.first] = a.last ; h[a.last] = a.first ; h }
+    direction   = reverse_map[original_direction.to_sym] || "reverse_of_#{original_direction}".to_sym
     @neighbors[direction]=neighbor
   end
   protected :add_reverse_neighbor
