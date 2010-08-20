@@ -77,10 +77,10 @@ class Cell
 
   def display
     w = '#' # wall character
-    north = (walls.member?(:north) && passable?(:north, false)) ? ' ' : w
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? ' ' : w
+    north = (walls.member?(:north) && passable?(:north, false)) ? (walked_on==true ? '.' : ' ') : w
+    west  = (walls.member?(:west ) && passable?(:west , false)) ? (walked_on==true ? '.' : ' ') : w
     [ [w,   north],
-      [west, ' '] ]
+      [west, (walked_on==true ? '.' : ' ')] ]
   end
   def walk_on
     walked_on=true
