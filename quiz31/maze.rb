@@ -76,13 +76,10 @@ class Cell
 
   def display
     w = '#' # wall character
-    north = (walls.member?(:north) && passable?(:north, false)) ? '|' : w
-    south = (walls.member?(:south) && passable?(:south, false)) ? '|' : w
-    east  = (walls.member?(:east ) && passable?(:east , false)) ? '-' : w
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? '-' : w
-    [ [w,   north,   w],
-      [west, '+', east],
-      [w,   south,   w] ]
+    north = (walls.member?(:north) && passable?(:north, false)) ? ' ' : w
+    west  = (walls.member?(:west ) && passable?(:west , false)) ? ' ' : w
+    [ [w,   north],
+      [west, ' '] ]
   end
 end
 
@@ -120,14 +117,17 @@ class Maze
   end
 
   def display
+    pad_char = '#' ; pad = pad_char * (width * 2 + 1)
     board.each {|cells|
-      rows = cells.inject([[],[],[]]) {|rows, cell|
+      rows = cells.inject([]) {|rows, cell|
         output = cell.display
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
-      puts rows.collect {|row| row.join }
+      rows = rows.collect {|row| "#{row.join}#{pad_char}" }
+      puts rows.collect {|row| row }
     }
+    puts pad
     nil
   end
   attr_reader :board, :length, :width
