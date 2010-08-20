@@ -63,6 +63,10 @@ class Cell
     neighbors.select {|dir,cell| cell.unvisited? }
   end
 
+  def not_walked_on_neighbors
+    neighbors.select {|dir,cell| !cell.walked_on }
+  end
+
 	def dump
 		[@neighbors,@walls]
 	end
