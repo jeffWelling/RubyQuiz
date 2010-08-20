@@ -74,12 +74,12 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
-  def display
-    w = '#' # wall character
-    north = (walls.member?(:north) && passable?(:north, false)) ? ' ' : w
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? ' ' : w
+  def display w = 'X', s = nil # wall character, space char - nil for -|
+    north = (walls.member?(:north) && passable?(:north, false)) ? (s || '|') : w
+    west  = (walls.member?(:west ) && passable?(:west , false)) ? (s || '-') : w
+    c = s ? s : '+'
     [ [w,   north],
-      [west, ' '] ]
+      [west, c] ]
   end
 end
 
@@ -120,7 +120,7 @@ class Maze
     pad_char = '#' ; pad = pad_char * (width * 2 + 1)
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell.display
+        output = cell.display(pad_char, ' ')
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
