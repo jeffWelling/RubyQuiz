@@ -75,13 +75,14 @@ class Cell
   end
 
   def display
-    north = (walls.member?(:north) && passable?(:north, false)) ? '|' : ' '
-    south = (walls.member?(:south) && passable?(:south, false)) ? '|' : ' '
-    east  = (walls.member?(:east ) && passable?(:east , false)) ? '-' : ' '
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? '-' : ' '
-    [ [' ', north, ' '],
+    w = '#' # wall character
+    north = (walls.member?(:north) && passable?(:north, false)) ? '|' : w
+    south = (walls.member?(:south) && passable?(:south, false)) ? '|' : w
+    east  = (walls.member?(:east ) && passable?(:east , false)) ? '-' : w
+    west  = (walls.member?(:west ) && passable?(:west , false)) ? '-' : w
+    [ [w,   north,   w],
       [west, '+', east],
-      [' ', south, ' '] ]
+      [w,   south,   w] ]
   end
 end
 
