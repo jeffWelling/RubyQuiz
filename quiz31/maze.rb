@@ -171,11 +171,16 @@ class Maze
 		@board
 	end
 
+  def random_cell
+    cell = nil
+    begin cell = board[rand(length)][rand(width)] end until cell
+    cell
+  end
+
   def generate options = {}
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
-    starting_cell = nil
-    begin starting_cell = board[rand(length)][rand(width)] end until starting_cell
+    starting_cell = random_cell
     list = [ starting_cell ]
     begin
       cell = list.last
@@ -194,8 +199,7 @@ class Maze
   def solve options = {}
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
-    starting_cell = nil
-    begin starting_cell = board[rand(length)][rand(width)] end until starting_cell
+    starting_cell = random_cell
     crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
       begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
