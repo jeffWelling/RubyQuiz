@@ -12,7 +12,7 @@ class Cell
 
 	attr_reader :neighbors, :walls, :walked_on
 
-  def currently_on_you
+  def set_current
     p [:coy_old, @@currently_on]
     p [:coy_new, self]
     @@currently_on=self
@@ -169,6 +169,7 @@ class Maze
     list = [ board[l][w] ]
     begin
       cell = list.last
+      begin ; print `clear` ; cell.set_current ; display ; sleep 0.1 ; end if watch
       unvisited = cell.unvisited_neighbors
       if unvisited.empty?
         list.pop
@@ -186,13 +187,7 @@ class Maze
     end_cell=board[-1][-1]
     crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
-      unless watch.nil?
-        puts `clear`
-        p [:solve, cell]
-        cell.currently_on_you
-        display
-        sleep 0.1
-      end
+      begin ; print `clear` ; cell.set_current ; display ; sleep 0.1 ; end if watch
       #This should return cell if cell is in the bottom right corner of the board
     }
   end 
