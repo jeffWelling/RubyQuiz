@@ -253,20 +253,36 @@ class Maze
     }
     len, wid = args.collect(&:to_i)
     maze = Maze.new len, wid, :circular => circular
-    watch = true
+    watch = true ; delay = 0.03
+    command = nil
+    result = nil
     loop do
+      print `clear`
+      puts "Last command: #{command}" if command
+      puts result if result
+      result = nil
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
+      options = {:watch => watch, :delay => delay}
       case command
-        when /^w/ ; watch = !watch ; puts "Watch is #{watch}"
+        when /^q/ ; break
+        when /^w/ ; watch = !watch ; result = "Watch is #{watch}"
         when /^n/ ; maze = Maze.new(len, wid, :circular => false)
         when /^c/ ; maze = Maze.new(len, wid, :circular => true)
-        when /^g/ ; maze.generate(:watch => watch)
-        when /^s/ ; maze.solve(:watch => watch)
-        when /^q/ ; return
+        when /^g/ ; maze.generate(options)
+        when /^s/ ; maze.solve(options)
+        when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
+        when /^([ijkl])/
+          maze.set_highlight maze.random_cell unless maze.highlighted_cell
+          dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}
+          dir = dirs[$1]
+          cell = maze.highlighted_cell
+          new = cell.neighbors[dir] if cell.passable?(dir,false)
+          maze.set_highlight new if new
       end
     end
+    maze
   end
 end
 
