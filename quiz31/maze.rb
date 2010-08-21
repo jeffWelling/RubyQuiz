@@ -109,7 +109,8 @@ class Maze
 	end
 
   def generate
-    l, w = rand(length), rand(width)
+    l, w = nil, nil
+    begin l, w = rand(length), rand(width) end until board[l][w]
     list = [ board[l][w] ]
     begin
       cell = list.last
