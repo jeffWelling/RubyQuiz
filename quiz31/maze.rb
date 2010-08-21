@@ -8,17 +8,16 @@ class Cell
 		@walls= {}
 		@neighbors= {}
     @walked_on=false
+    @highlight=false
 	end
 
 	attr_reader :neighbors, :walls
 
   def walked_on? ; @walked_on ; end
 
-  def set_current
-    p [:coy_old, @@currently_on]
-    p [:coy_new, self]
-    @@currently_on=self
-  end
+  def set_highlight state = true ; @highlight = state ; end
+  def unset_highlight ; set_highlight false ; end
+  def highlight? ; @highlight ; end
 
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
@@ -89,21 +88,17 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
-  def current_cell?
-    begin @@currently_on rescue @@currently_on = nil end == self
-  end
-
   def display options = {}
-    wall    = options[:wall]    || '#'
-    current = options[:current] || 'X'
-    walked  = options[:walked]  || '.'
-    open    = options[:open]    || ' '
+    wall      = options[:wall]      || '#'
+    highlight = options[:highlight] || 'X'
+    walked    = options[:walked]    || '.'
+    open      = options[:open]      || ' '
     north_south_open = options[:north_south_open]
     east_west_open   = options[:east_west_open]
 
     if walls.member?(:north) && passable?(:north, false)
-      if current_cell?
-        north=current
+      if highlight?
+        north=highlight
       elsif walked_on?
         north=walked
       else
@@ -114,8 +109,8 @@ class Cell
     end
 
     if walls.member?(:west) && passable?(:west, false)
-      if current_cell?
-        west=current
+      if highlight?
+        west=highlight
       elsif walked_on?
         west=walked
       else
@@ -125,8 +120,8 @@ class Cell
       west=wall
     end
 
-    if current_cell?
-      floor=current
+    if highlight?
+      floor=highlight
     elsif unvisited?
       floor=wall
     elsif walked_on?
@@ -171,6 +166,12 @@ class Maze
 		@board
 	end
 
+  def set_highlight cell
+    @highlighted_cell.unset_highlight if @highlighted_cell
+    @highlighted_cell = cell
+    @highlighted_cell.set_highlight
+  end
+
   def random_cell
     cell = nil
     begin cell = board[rand(length)][rand(width)] end until cell
@@ -184,7 +185,7 @@ class Maze
     list = [ starting_cell ]
     begin
       cell = list.last
-      begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
+      begin ; print `clear` ; set_highlight cell ; display ; sleep delay ; end if watch
       unvisited = cell.unvisited_neighbors
       if unvisited.empty?
         list.pop
@@ -202,7 +203,7 @@ class Maze
     starting_cell = random_cell
     crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
-      begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
+      begin ; print `clear` ; set_highlight cell ; display ; sleep delay ; end if watch
     }
   end 
 
@@ -237,7 +238,7 @@ class Maze
     puts pad
     nil
   end
-  attr_reader :board, :length, :width
+  attr_reader :board, :length, :width, :highlighted_cell
 
   def self.cli args
     circular = false
