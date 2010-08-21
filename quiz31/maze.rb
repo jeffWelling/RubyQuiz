@@ -147,7 +147,9 @@ class Maze
   end 
 
   def crawl(starting_cell, get_neighbors)
-    list=[starting_cell]
+    l, w = nil, nil
+    begin l, w = rand(length), rand(width) end until board[l][w]
+    list = [ board[l][w] ]
     begin
       cell=list.last
       neighbors= cell.send(get_neighbors.to_sym)
