@@ -11,8 +11,8 @@ class Cell
 	attr_reader :neighbors, :walls, :walked_on
 
   def currently_on_you
-    puts self.inspect
-    puts @@currently_on.inspect
+    p [:coy_old, @@currently_on]
+    p [:coy_new, self]
     @@currently_on=self
   end
 
@@ -169,7 +169,7 @@ class Maze
       cell.walk_on
       unless watch.nil?
         puts `clear`
-        puts cell.inspect
+        p [:solve, cell]
         cell.currently_on_you
         display
         sleep 1
