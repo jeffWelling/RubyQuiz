@@ -101,8 +101,10 @@ class Maze
 			@board[l] ||=[]
 			(0...width).each{|w|
 				@board[l][w]=cell=Cell.new
-        @board[l-1][w].add_neighbor(:south, cell) unless l == 0
-				@board[l][w-1].add_neighbor(:east,  cell) unless w == 0
+        oc = @board[l-1][w]
+        oc.add_neighbor(:south, cell) unless l == 0 if oc
+				oc = @board[l][w-1]
+        oc.add_neighbor(:east,  cell) unless w == 0 if oc
 			}
 		}
 		@board
