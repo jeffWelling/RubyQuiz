@@ -192,7 +192,7 @@ class Maze
     delay = options[:delay].to_f || 0.2
     starting_cell = nil
     begin starting_cell = board[rand(length)][rand(width)] end until starting_cell
-    crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
+    crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
       begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
     }
