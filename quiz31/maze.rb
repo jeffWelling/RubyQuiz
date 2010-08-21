@@ -244,13 +244,13 @@ class Maze
     }
     len, wid = args.collect(&:to_i)
     maze = Maze.new len, wid, :circular => circular
+    watch = true
     loop do
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
-      watch = true
       case command
-        when /^w/ ; watch = !watch
+        when /^w/ ; watch = !watch ; puts "Watch is #{watch}"
         when /^n/ ; maze = Maze.new(len, wid, :circular => false)
         when /^c/ ; maze = Maze.new(len, wid, :circular => true)
         when /^g/ ; maze.generate(:watch => watch)
