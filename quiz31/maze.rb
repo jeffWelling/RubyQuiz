@@ -10,7 +10,9 @@ class Cell
     @walked_on=false
 	end
 
-	attr_reader :neighbors, :walls, :walked_on
+	attr_reader :neighbors, :walls
+
+  def walked_on? ; @walked_on ; end
 
   def set_current
     p [:coy_old, @@currently_on]
@@ -72,7 +74,7 @@ class Cell
   end
 
   def not_walked_on_neighbors
-    neighbors.select {|dir,cell| self.passable?(dir) and !cell.walked_on }
+    neighbors.select {|dir,cell| self.passable?(dir) and !cell.walked_on? }
   end
 
 	def dump
@@ -102,7 +104,7 @@ class Cell
     if walls.member?(:north) && passable?(:north, false)
       if the_current_cell?
         north=current
-      elsif walked_on==true
+      elsif walked_on?
         north=walked
       else
         north=north_south_open || open
@@ -114,7 +116,7 @@ class Cell
     if walls.member?(:west) && passable?(:west, false)
       if the_current_cell?
         west=current
-      elsif walked_on==true
+      elsif walked_on?
         west=walked
       else
         west=east_west_open || open
@@ -125,7 +127,7 @@ class Cell
 
     if the_current_cell?
       floor=current
-    elsif walked_on==true
+    elsif walked_on?
       floor=walked
     else
       floor=open
