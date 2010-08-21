@@ -6,6 +6,7 @@ class Cell
 		@walls= {}
 		@neighbors= {}
     @walked_on=false
+    @distance_from_start=nil
 	end
 
 	attr_reader :neighbors, :walls, :walked_on 
