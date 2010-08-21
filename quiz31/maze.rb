@@ -9,10 +9,14 @@ class Cell
     @distance_from_start=nil
 	end
 
-	attr_reader :neighbors, :walls, :walked_on
+	attr_reader :neighbors, :walls, :walked_on, :distance_from_start
 
   def currently_on_you
     @@currently_on=self
+  end
+
+  def set_distance distance
+    @distance_from_start=distance
   end
 
 	def set_wall direction, state = true, both = true
@@ -168,8 +172,9 @@ class Maze
   def solve start_cell=nil, end_cell=nil, watch=nil
     start_cell||=board[0][0]
     end_cell||=board[-1][-1]
-    crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
+    crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir, distance|
       cell.walk_on
+      cell.set_distance distance
       unless watch.nil?
         puts `clear`
         cell.currently_on_you
@@ -182,17 +187,20 @@ class Maze
   end 
 
   def crawl(starting_cell, get_neighbors)
+    distnce=0
     list=[starting_cell]
     begin
       cell=list.last
       neighbors= cell.send(get_neighbors.to_sym)
       if neighbors.empty?
-        yield cell,nil
+        yield cell,nil,distance
         list.pop
+        distance-=1
       else
         dir, other = neighbors.random
-        yield cell, dir
+        yield cell, dir, distance
         list << other
+        distance+=1
       end
     end while !list.empty?
   end
