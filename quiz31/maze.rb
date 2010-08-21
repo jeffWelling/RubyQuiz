@@ -143,7 +143,6 @@ class Maze
         sleep 1
       end
       #This should return cell if cell is in the bottom right corner of the board
-      return cell if cell==end_cell
     }
   end 
 
