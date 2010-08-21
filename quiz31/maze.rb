@@ -232,23 +232,23 @@ class Maze
     p args
     circular = false
     args.each {|arg|
-      p [:ae, arg]
-      next unless arg =~ /^-+([^=]*)=(.*)/
-      p [:aer, $0, $1, $2]
-      args.delete arg
+      next unless arg =~ /^-+([^=]*)(=(.*))?/ # key=val stored in $1 and $3
+      args.delete arg                         # all non-numeric args are parsed and removed
       case $1
-        when /^c(irc|ircle)?$/ ; circular = true
+        when /^c(irc(le|ular)?)?$/ ; circular = true
       end
     }
-    len, wid = args
-    maze = Maze.new len.to_i, wid.to_i
+    len, wid = args.collect(&:to_i)
+    maze = Maze.new len, wid, :circular => circular
     loop do
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
       case command
+        when /^n/ ; maze = Maze.new(len, wid, :circular => false) ; maze.generate
+        when /^c/ ; maze = Maze.new(len, wid, :circular => true)  ; maze.generate
         when /^g/ ; maze.generate
-        when /^s/ ; maze.solve
+        when /^s/ ; maze.solve true
         when /^q/ ; return
       end
     end
