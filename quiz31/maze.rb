@@ -219,8 +219,8 @@ class Maze
   end
 
   def display
-    fake = [['?','?'],['?','?']]
     wall_char = '#' ; pad = wall_char * (width * 2 + 1)
+    fake = [[wall_char, wall_char], [wall_char, wall_char]]
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
         output = cell ? cell.display(:wall => wall_char) : fake
