@@ -229,13 +229,14 @@ class Maze
   attr_reader :board, :length, :width
 
   def self.cli args
-    p args
     circular = false
     args.each {|arg|
       next unless arg =~ /^-+([^=]*)(=(.*))?/ # key=val stored in $1 and $3
       args.delete arg                         # all non-numeric args are parsed and removed
-      case $1
+      key, value = $1, $3
+      case key
         when /^c(irc(le|ular)?)?$/ ; circular = true
+        else ; puts "Unknown option #{arg} - parsed as #{key.inspect} = #{value.inspect}" ; exit
       end
     }
     len, wid = args.collect(&:to_i)
