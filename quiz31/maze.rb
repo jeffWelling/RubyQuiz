@@ -170,7 +170,7 @@ class Maze
     list = [ starting_cell ]
     begin
       cell = list.last
-      begin ; print `clear` ; cell.set_current ; display ; sleep 0.1 ; end if watch
+      begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
       unvisited = cell.unvisited_neighbors
       if unvisited.empty?
         list.pop
@@ -184,12 +184,12 @@ class Maze
 
   def solve options = {}
     watch = options[:watch]
+    delay = options[:delay].to_f || 0.2
     starting_cell = nil
     begin starting_cell = board[rand(length)][rand(width)] end until starting_cell
     crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
-      begin ; print `clear` ; cell.set_current ; display ; sleep 0.1 ; end if watch
-      #This should return cell if cell is in the bottom right corner of the board
+      begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
     }
   end 
 
