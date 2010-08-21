@@ -248,11 +248,13 @@ class Maze
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
+      watch = true
       case command
-        when /^n/ ; maze = Maze.new(len, wid, :circular => false) ; maze.generate
-        when /^c/ ; maze = Maze.new(len, wid, :circular => true)  ; maze.generate
-        when /^g/ ; maze.generate
-        when /^s/ ; maze.solve true
+        when /^w/ ; watch = !watch
+        when /^n/ ; maze = Maze.new(len, wid, :circular => false)
+        when /^c/ ; maze = Maze.new(len, wid, :circular => true)
+        when /^g/ ; maze.generate(:watch => watch)
+        when /^s/ ; maze.solve(:watch => watch)
         when /^q/ ; return
       end
     end
