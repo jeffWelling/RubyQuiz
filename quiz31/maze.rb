@@ -86,7 +86,7 @@ class Cell
   end
 
   def the_current_cell?
-    @@currently_on == self
+    begin @@currently_on rescue @@currently_on = nil end == self
   end
 
   def display
