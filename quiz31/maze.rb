@@ -152,10 +152,11 @@ class Maze
   end
 
   def display
+    fake = [['?','?'],['?','?']]
     pad_char = '#' ; pad = pad_char * (width * 2 + 1)
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell.display
+        output = cell ? cell.display : fake
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
