@@ -85,12 +85,16 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
+  def the_current_cell?
+    @@currently_on == self
+  end
+
   def display
     w = '#' # wall character
     on='X'
 
     if walls.member?(:north) && passable?(:north, false)
-      if currently_on==self
+      if the_current_cell?
         north=on
       elsif walked_on==true
         north='.'
@@ -102,7 +106,7 @@ class Cell
     end
 
     if walls.member?(:west) && passable?(:west, false)
-      if currently_on==self
+      if the_current_cell?
         west=on
       elsif walked_on==true
         west='.'
@@ -113,7 +117,7 @@ class Cell
       west=w
     end
 
-    if currently_on==self
+    if the_current_cell?
       c=on
     elsif walked_on==true
       c='.'
