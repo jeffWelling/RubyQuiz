@@ -165,9 +165,9 @@ class Maze
     end while !list.empty?
   end 
 
-  def solve watch=nil
-    start_cell=board[0][0]
-    end_cell=board[-1][-1]
+  def solve start_cell=nil, end_cell=nil, watch=nil
+    start_cell||=board[0][0]
+    end_cell||=board[-1][-1]
     crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
       unless watch.nil?
