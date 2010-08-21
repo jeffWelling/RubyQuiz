@@ -110,8 +110,20 @@ class Maze
 
   def generate
     l, w = rand(length), rand(width)
-    crawl( board[l][w], 'unvisited_neighbors' ) {|cell,dir| cell.unset_wall dir }
-  end
+    list = [ board[l][w] ]
+    begin
+      cell = list.last
+      unvisited = cell.unvisited_neighbors
+      if unvisited.empty?
+        list.pop
+      else
+        dir, other = unvisited.random
+        cell.unset_wall dir 
+        list << other
+      end 
+    end while !list.empty?
+  end 
+
   def solve
     cell=board[0][0]
     crawl( cell, 'not_walked_on_neighbors' ) {|cell, dir|
