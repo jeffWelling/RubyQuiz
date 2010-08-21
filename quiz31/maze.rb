@@ -140,7 +140,7 @@ class Maze
       unless watch.nil?
         puts `clear`
         display
-        sleep 1
+        sleep 0.1
       end
       #This should return cell if cell is in the bottom right corner of the board
     }
