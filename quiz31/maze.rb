@@ -89,7 +89,7 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
-  def the_current_cell?
+  def current_cell?
     begin @@currently_on rescue @@currently_on = nil end == self
   end
 
@@ -102,7 +102,7 @@ class Cell
     east_west_open   = options[:east_west_open]
 
     if walls.member?(:north) && passable?(:north, false)
-      if the_current_cell?
+      if current_cell?
         north=current
       elsif walked_on?
         north=walked
@@ -114,7 +114,7 @@ class Cell
     end
 
     if walls.member?(:west) && passable?(:west, false)
-      if the_current_cell?
+      if current_cell?
         west=current
       elsif walked_on?
         west=walked
@@ -125,7 +125,7 @@ class Cell
       west=wall
     end
 
-    if the_current_cell?
+    if current_cell?
       floor=current
     elsif walked_on?
       floor=walked
