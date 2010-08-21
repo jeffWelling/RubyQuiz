@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 class Array ; def random ; return nil if length.zero? ; entries[rand(length)] ; end ; end
 
 class Cell
@@ -5,9 +7,16 @@ class Cell
 	def initialize walls=nil
 		@walls= {}
 		@neighbors= {}
+    @walked_on=false
 	end
 
-	attr_reader :neighbors, :walls
+	attr_reader :neighbors, :walls, :walked_on
+
+  def set_current
+    p [:coy_old, @@currently_on]
+    p [:coy_new, self]
+    @@currently_on=self
+  end
 
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
@@ -62,6 +71,10 @@ class Cell
     neighbors.select {|dir,cell| cell.unvisited? }
   end
 
+  def not_walked_on_neighbors
+    neighbors.select {|dir,cell| self.passable?(dir) and !cell.walked_on }
+  end
+
 	def dump
 		[@neighbors,@walls]
 	end
@@ -74,17 +87,62 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
-  def display w = 'X', s = nil # wall character, space char - nil for -|
-    north = (walls.member?(:north) && passable?(:north, false)) ? (s || '|') : w
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? (s || '-') : w
-    c = s ? s : '+'
-    [ [w,   north],
-      [west, c] ]
+  def the_current_cell?
+    begin @@currently_on rescue @@currently_on = nil end == self
+  end
+
+  def display options = {}
+    wall    = options[:wall]    || '#'
+    current = options[:current] || 'X'
+    walked  = options[:walked]  || '.'
+    open    = options[:open]    || ' '
+    north_south_open = options[:north_south_open]
+    east_west_open   = options[:east_west_open]
+
+    if walls.member?(:north) && passable?(:north, false)
+      if the_current_cell?
+        north=current
+      elsif walked_on==true
+        north=walked
+      else
+        north=north_south_open || open
+      end
+    else
+      north=wall
+    end
+
+    if walls.member?(:west) && passable?(:west, false)
+      if the_current_cell?
+        west=current
+      elsif walked_on==true
+        west=walked
+      else
+        west=east_west_open || open
+      end
+    else
+      west=wall
+    end
+
+    if the_current_cell?
+      floor=current
+    elsif walked_on==true
+      floor=walked
+    else
+      floor=open
+    end
+
+    [ [wall,   north],
+      [west, floor] ]
+  end
+
+  def walk_on
+    @walked_on=true
   end
 end
 
 class Maze
-	def initialize length, width
+	def initialize length, width, options = {}
+    circular = options[:circular]
     @length, @width = length, width
 		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
 
@@ -92,43 +150,115 @@ class Maze
 		(0...length).each {|l|
 			@board[l] ||=[]
 			(0...width).each{|w|
+        if circular
+  				@board[l][w]=nil
+          d = ((l - length / 2) ** 2 + (w - width / 2) ** 2)
+          dim = [length, width].min / 2.to_f
+          next unless d < ((    dim / 1) ** 2 - 2)
+          next unless d > ((    dim / 3) ** 2 - 1)
+        end
 				@board[l][w]=cell=Cell.new
-        @board[l-1][w].add_neighbor(:south, cell) unless l == 0
-				@board[l][w-1].add_neighbor(:east,  cell) unless w == 0
+        oc = @board[l-1][w]
+        oc.add_neighbor(:south, cell) unless l == 0 if oc
+				oc = @board[l][w-1]
+        oc.add_neighbor(:east,  cell) unless w == 0 if oc
 			}
 		}
 		@board
 	end
 
-  def generate
-    l, w = rand(length), rand(width)
-    list = [ board[l][w] ]
+  def generate options = {}
+    watch = options[:watch]
+    delay = options[:delay].to_f || 0.2
+    starting_cell = nil
+    begin starting_cell = board[rand(length)][rand(width)] end until starting_cell
+    list = [ starting_cell ]
     begin
       cell = list.last
+      begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
       unvisited = cell.unvisited_neighbors
       if unvisited.empty?
         list.pop
       else
         dir, other = unvisited.random
-        cell.unset_wall dir
+        cell.unset_wall dir 
+        list << other
+      end 
+    end while !list.empty?
+  end 
+
+  def solve options = {}
+    watch = options[:watch]
+    delay = options[:delay].to_f || 0.2
+    starting_cell = nil
+    begin starting_cell = board[rand(length)][rand(width)] end until starting_cell
+    crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
+      cell.walk_on
+      begin ; print `clear` ; cell.set_current ; display ; sleep delay ; end if watch
+    }
+  end 
+
+  def crawl(starting_cell, get_neighbors)
+    list = [ starting_cell ]
+    begin
+      cell=list.last
+      neighbors= cell.send(get_neighbors.to_sym)
+      if neighbors.empty?
+        yield cell,nil
+        list.pop
+      else
+        dir, other = neighbors.random
+        yield cell, dir
         list << other
       end
     end while !list.empty?
   end
 
   def display
-    pad_char = '#' ; pad = pad_char * (width * 2 + 1)
+    fake = [['?','?'],['?','?']]
+    wall_char = '#' ; pad = wall_char * (width * 2 + 1)
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell.display(pad_char, ' ')
+        output = cell ? cell.display(:wall => wall_char) : fake
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
-      rows = rows.collect {|row| "#{row.join}#{pad_char}" }
+      rows = rows.collect {|row| "#{row.join}#{wall_char}" }
       puts rows.collect {|row| row }
     }
     puts pad
     nil
   end
   attr_reader :board, :length, :width
+
+  def self.cli args
+    circular = false
+    args.each {|arg|
+      next unless arg =~ /^-+([^=]*)(=(.*))?/ # key=val stored in $1 and $3
+      args.delete arg                         # all non-numeric args are parsed and removed
+      key, value = $1, $3
+      case key
+        when /^c(irc(le|ular)?)?$/ ; circular = true
+        else ; puts "Unknown option #{arg} - parsed as #{key.inspect} = #{value.inspect}" ; exit
+      end
+    }
+    len, wid = args.collect(&:to_i)
+    maze = Maze.new len, wid, :circular => circular
+    loop do
+      maze.display
+      puts "Command: "
+      command = $stdin.gets.strip
+      case command
+        when /^n/ ; maze = Maze.new(len, wid, :circular => false) ; maze.generate
+        when /^c/ ; maze = Maze.new(len, wid, :circular => true)  ; maze.generate
+        when /^g/ ; maze.generate
+        when /^s/ ; maze.solve true
+        when /^q/ ; return
+      end
+    end
+  end
+end
+
+if $0 == __FILE__
+  Maze.cli ARGV
 end
