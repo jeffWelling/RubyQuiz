@@ -142,16 +142,24 @@ class Maze
 		(0...length).each {|l|
 			@board[l] ||=[]
 			(0...width).each{|w|
+				@board[l][w]=nil
+        d = ((l - length / 2) ** 2 + (w - width / 2) ** 2)
+        dim = [length, width].min / 2.to_f
+        next unless d < ((    dim / 1) ** 2 - 2)
+        next unless d > ((    dim / 3) ** 2 - 1)
 				@board[l][w]=cell=Cell.new
-        @board[l-1][w].add_neighbor(:south, cell) unless l == 0
-				@board[l][w-1].add_neighbor(:east,  cell) unless w == 0
+        oc = @board[l-1][w]
+        oc.add_neighbor(:south, cell) unless l == 0 if oc
+				oc = @board[l][w-1]
+        oc.add_neighbor(:east,  cell) unless w == 0 if oc
 			}
 		}
 		@board
 	end
 
   def generate
-    l, w = rand(length), rand(width)
+    l, w = nil, nil
+    begin l, w = rand(length), rand(width) end until board[l][w]
     list = [ board[l][w] ]
     begin
       cell = list.last
@@ -176,15 +184,16 @@ class Maze
         p [:solve, cell]
         cell.currently_on_you
         display
-        sleep 1
+        sleep 0.1
       end
       #This should return cell if cell is in the bottom right corner of the board
-      return cell if cell==end_cell
     }
   end 
 
   def crawl(starting_cell, get_neighbors)
-    list=[starting_cell]
+    l, w = nil, nil
+    begin l, w = rand(length), rand(width) end until board[l][w]
+    list = [ board[l][w] ]
     begin
       cell=list.last
       neighbors= cell.send(get_neighbors.to_sym)
@@ -200,10 +209,11 @@ class Maze
   end
 
   def display
+    fake = [['?','?'],['?','?']]
     pad_char = '#' ; pad = pad_char * (width * 2 + 1)
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell.display
+        output = cell ? cell.display : fake
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
