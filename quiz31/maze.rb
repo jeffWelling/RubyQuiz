@@ -6,9 +6,16 @@ class Cell
 		@walls= {}
 		@neighbors= {}
     @walked_on=false
+    @@currently_on=nil
 	end
 
-	attr_reader :neighbors, :walls, :walked_on 
+	attr_reader :neighbors, :walls, :walked_on, :currently_on 
+
+  def currently_on_you
+    puts self.inspect
+    puts @@currently_on.inspect
+    @@currently_on=self
+  end
 
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
