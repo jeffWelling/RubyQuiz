@@ -9,7 +9,11 @@ class Cell
     @distance_from_start=nil
 	end
 
-	attr_reader :neighbors, :walls, :walked_on 
+	attr_reader :neighbors, :walls, :walked_on
+
+  def currently_on_you
+    @@currently_on=self
+  end
 
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
@@ -80,12 +84,48 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
+  def the_current_cell?
+    begin @@currently_on rescue @@currently_on = nil end == self
+  end
+
   def display
     w = '#' # wall character
-    north = (walls.member?(:north) && passable?(:north, false)) ? (walked_on==true ? '.' : ' ') : w
-    west  = (walls.member?(:west ) && passable?(:west , false)) ? (walked_on==true ? '.' : ' ') : w
+    on='X'
+
+    if walls.member?(:north) && passable?(:north, false)
+      if the_current_cell?
+        north=on
+      elsif walked_on==true
+        north='.'
+      else
+        north=' '
+      end
+    else
+      north=w
+    end
+
+    if walls.member?(:west) && passable?(:west, false)
+      if the_current_cell?
+        west=on
+      elsif walked_on==true
+        west='.'
+      else
+        west=' '
+      end
+    else
+      west=w
+    end
+
+    if the_current_cell?
+      c=on
+    elsif walked_on==true
+      c='.'
+    else
+      c=' '
+    end
+
     [ [w,   north],
-      [west, (walked_on==true ? '.' : ' ')] ]
+      [west, c] ]
   end
   def walk_on
     @walked_on=true
@@ -125,11 +165,17 @@ class Maze
     end while !list.empty?
   end 
 
-  def solve
+  def solve watch=nil
     start_cell=board[0][0]
     end_cell=board[-1][-1]
     crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
+      unless watch.nil?
+        puts `clear`
+        cell.currently_on_you
+        display
+        sleep 1
+      end
       #This should return cell if cell is in the bottom right corner of the board
       return cell if cell==end_cell
     }
