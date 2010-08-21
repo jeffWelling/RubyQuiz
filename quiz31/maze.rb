@@ -127,6 +127,8 @@ class Cell
 
     if current_cell?
       floor=current
+    elsif unvisited?
+      floor=wall
     elsif walked_on?
       floor=walked
     else
