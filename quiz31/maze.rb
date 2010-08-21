@@ -100,6 +100,11 @@ class Maze
 		(0...length).each {|l|
 			@board[l] ||=[]
 			(0...width).each{|w|
+				@board[l][w]=nil
+        d = ((l - length / 2) ** 2 + (w - width / 2) ** 2)
+        dim = [length, width].min / 2.to_f
+        next unless d < ((    dim / 1) ** 2 - 2)
+        next unless d > ((    dim / 3) ** 2 - 1)
 				@board[l][w]=cell=Cell.new
         oc = @board[l-1][w]
         oc.add_neighbor(:south, cell) unless l == 0 if oc
