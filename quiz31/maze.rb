@@ -170,6 +170,7 @@ class Maze
       cell.walk_on
       unless watch.nil?
         puts `clear`
+        puts cell.inspect
         cell.currently_on_you
         display
         sleep 1
