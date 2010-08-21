@@ -125,19 +125,22 @@ class Maze
   end 
 
   def solve
-    cell=board[0][0]
-    crawl( cell, 'not_walked_on_neighbors' ) {|cell, dir|
-      #This should return cell if cell is in the bottom right corner of the board
+    start_cell=board[0][0]
+    end_cell=board[-1][-1]
+    crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
-      return cell if cell==board[ -1 ][-1 ]
+      #This should return cell if cell is in the bottom right corner of the board
+      return cell if cell==end_cell
     }
-  end
+  end 
+
   def crawl(starting_cell, get_neighbors)
     list=[starting_cell]
     begin
       cell=list.last
       neighbors= cell.send(get_neighbors.to_sym)
       if neighbors.empty?
+        yield cell,nil
         list.pop
       else
         dir, other = neighbors.random
