@@ -132,11 +132,16 @@ class Maze
     end while !list.empty?
   end 
 
-  def solve
+  def solve watch=nil
     start_cell=board[0][0]
     end_cell=board[-1][-1]
     crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
+      unless watch.nil?
+        puts `clear`
+        display
+        sleep 1
+      end
       #This should return cell if cell is in the bottom right corner of the board
       return cell if cell==end_cell
     }
