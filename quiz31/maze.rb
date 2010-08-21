@@ -214,4 +214,34 @@ class Maze
     nil
   end
   attr_reader :board, :length, :width
+
+  def self.cli args
+    p args
+    circular = false
+    args.each {|arg|
+      p [:ae, arg]
+      next unless arg =~ /^-+([^=]*)=(.*)/
+      p [:aer, $0, $1, $2]
+      args.delete arg
+      case $1
+        when /^c(irc|ircle)?$/ ; circular = true
+      end
+    }
+    len, wid = args
+    maze = Maze.new len.to_i, wid.to_i
+    loop do
+      maze.display
+      puts "Command: "
+      command = $stdin.gets.strip
+      case command
+        when /^g/ ; maze.generate
+        when /^s/ ; maze.solve
+        when /^q/ ; return
+      end
+    end
+  end
+end
+
+if $0 == __FILE__
+  Maze.cli ARGV
 end
