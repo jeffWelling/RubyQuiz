@@ -162,7 +162,8 @@ class Maze
 		@board
 	end
 
-  def generate
+  def generate options = {}
+    watch = options[:watch]
     l, w = nil, nil
     begin l, w = rand(length), rand(width) end until board[l][w]
     list = [ board[l][w] ]
@@ -179,7 +180,8 @@ class Maze
     end while !list.empty?
   end 
 
-  def solve watch=nil
+  def solve options = {}
+    watch = options[:watch]
     start_cell=board[0][0]
     end_cell=board[-1][-1]
     crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir|
