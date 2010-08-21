@@ -8,7 +8,7 @@ class Cell
     @walked_on=false
 	end
 
-	attr_reader :neighbors, :walls, :walked_on, :currently_on 
+	attr_reader :neighbors, :walls, :walked_on
 
   def currently_on_you
     puts self.inspect
