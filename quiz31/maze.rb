@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 class Array ; def random ; return nil if length.zero? ; entries[rand(length)] ; end ; end
 
 class Cell
