@@ -147,6 +147,7 @@ class Maze
   end
 
   def setup_board options = {}
+    @generated = false
     circular = options[:circular]
 		@board=[[]]
 		(0...length).each {|l|
@@ -198,6 +199,7 @@ class Maze
         list << other
       end 
     end while !list.empty?
+    @generated = true
   end 
 
   def solve options = {}
@@ -241,7 +243,7 @@ class Maze
     puts pad
     nil
   end
-  attr_reader :board, :length, :width, :highlighted_cell
+  attr_reader :board, :length, :width, :highlighted_cell, :generated
 
   def self.cli args
     circular = false
