@@ -313,12 +313,13 @@ class Maze
         when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new $1, $2, options
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
         when /^([ijkl])/
-          maze.highlighted_cell.walk_on
+          next unless maze.highlighted_cell
           dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}
           dir = dirs[$1]
           cell = maze.highlighted_cell
           new = cell.neighbors[dir] if cell.passable?(dir,false)
           maze.set_highlight new if new
+          maze.highlighted_cell.walk_on
       end
     end
     maze
