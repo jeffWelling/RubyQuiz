@@ -109,6 +109,8 @@ class Cell
       open
     end
 
+    return floor if options[:cell_display_size] == 1
+
     north, south, east, west = %w(north south east west).collect {|dir| passable?(dir, false) ? floor  : wall }
     nw, ne, se, sw =           %w(nw ne se sw          ).collect {|dir| options["#{dir}_wall".to_sym] || wall }
 
@@ -317,7 +319,7 @@ class Maze
         when /^g/ ; maze.generate(options)
         when /^s/ ; maze.solve(options)
         when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new options.merge!({:length => $1, :width => $2})
-        when /^([23])$/ ; options[:cell_display_size] = $1.to_i
+        when /^([123])$/ ; options[:cell_display_size] = $1.to_i
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
         when /^([ijkl])/
           next unless maze.highlighted_cell
