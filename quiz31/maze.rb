@@ -259,12 +259,13 @@ class Maze
     end while !list.empty?
   end
 
-  def display
-    wall_char = '#' ; pad = wall_char * (width * 2 + 1)
+  def display options = {}
+    wall_char = options[:wall_char] ||= '#'
+    pad = wall_char * (width * (options[:cell_display_size] || 2) + 1)
     fake = [[wall_char, wall_char], [wall_char, wall_char]]
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell ? cell.display(:wall => wall_char) : fake
+        output = cell ? cell.display(options) : fake
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
