@@ -12,6 +12,7 @@ class Cell
 	end
 
 	attr_reader :neighbors, :walls
+  attr_accessor :contents
 
   def walked_on? ; @walked_on ; end
 
@@ -122,6 +123,8 @@ class Cell
 
     if highlight?
       floor=highlight
+    elsif contents
+      floor=contents[0..0]
     elsif unvisited?
       floor=wall
     elsif walked_on?
