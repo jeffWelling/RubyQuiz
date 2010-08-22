@@ -32,7 +32,7 @@ class Cell
 
   def passable? direction, both = false
     direction = direction.to_sym
-    raise "No such neighbor - #{direction} from #{inspect}" unless @neighbors[direction]
+    return false unless neighbors[direction]
     return false unless neighbors[direction].passable? reverse_dir(direction), false if both
     !@walls[direction] # if there isn't a wall, you're free to go
   end
