@@ -151,8 +151,13 @@ class Maze
     setup_board options
   end
 
+  def wipe_designations
+    @highlighted_cell = @start_cell = @end_cell = nil
+  end
+
   def setup_board options = {}
     @generated = false
+    wipe_designations
     circular = options[:circular]
 		@board=[[]]
 		(0...length).each {|l|
