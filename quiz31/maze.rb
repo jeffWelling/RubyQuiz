@@ -149,11 +149,10 @@ class Maze
   end
 
   def wipe_designations
-    @highlighted_cell = @start_cell = @end_cell = nil
+    @highlighted_cell = @start_cell = @end_cell = @generated = @solved = nil
   end
 
   def setup_board options = {}
-    @generated = false
     wipe_designations
     circular = options[:circular]
 		@board=[[]]
