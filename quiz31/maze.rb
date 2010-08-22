@@ -202,6 +202,7 @@ class Maze
         list << other
       end 
     end while !list.empty?
+    set_highlight nil if watch
     @generated = true
   end 
 
@@ -213,6 +214,7 @@ class Maze
       cell.walk_on
       begin ; print `clear` ; set_highlight cell ; display ; sleep delay ; end if watch
     }
+    set_highlight nil if watch
   end 
 
   def crawl(starting_cell, get_neighbors)
