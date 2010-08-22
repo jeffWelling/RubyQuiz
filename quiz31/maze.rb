@@ -275,6 +275,7 @@ class Maze
         when /^c/ ; maze.setup_board(:circular => true)
         when /^g/ ; maze.generate(options)
         when /^s/ ; maze.solve(options)
+        when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new $1, $2, options
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
         when /^([ijkl])/
           maze.set_highlight maze.random_cell unless maze.highlighted_cell
