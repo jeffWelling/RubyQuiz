@@ -226,14 +226,15 @@ class Maze
     return nil unless generated
     cells = board.flatten.compact
     num = cells.length
-    branches = dead_ends = unreachable = 0
+    branches = dead_ends = walked_on = unreachable = 0
     cells.each {|cell|
       exits = cell.walls.select {|d,state| !state }.length
       dead_ends += 1 if exits == 1
       branches += (exits - 2) if exits > 2
+      walked_on += 1 if cell.walked_on?
       unreachable += 1 if cell.unvisited? || exits == 0 
     }
-    [num, branches, dead_ends, (num / branches.to_f), unreachable]
+    [num, branches, dead_ends, (num / branches.to_f), walked_on, unreachable]
   end
 
   def solve options = {}
