@@ -97,22 +97,13 @@ class Cell
     north_south_open = options[:north_south_open]
     east_west_open   = options[:east_west_open]
 
-    floor = if highlight?
-      highlight
-    elsif contents
-      contents[0..0]
-    elsif unvisited?
-      wall
-    elsif walked_on?
-      walked
-    else
-      open
-    end
+    base_floor = walked_on? ? walked : open
+    floor = (highlight if highlight?) || (contents[0..0] if contents) || base_floor
 
     return floor if options[:cell_display_size] == 1
 
-    north, south, east, west = %w(north south east west).collect {|dir| passable?(dir, false) ? floor  : wall }
-    nw, ne, se, sw =           %w(nw ne se sw          ).collect {|dir| options["#{dir}_wall".to_sym] || wall }
+    north, south, east, west = %w(north south east west).collect {|dir| passable?(dir, false) ? base_floor  : wall }
+    nw, ne, se, sw =           %w(nw ne se sw          ).collect {|dir| options["#{dir}_wall".to_sym]      || wall }
 
     if options[:darkness] && !walked_on?
       north = south = east = west = nw = ne = se = sw = ' '
