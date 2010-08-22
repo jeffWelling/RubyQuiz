@@ -97,42 +97,34 @@ class Cell
     north_south_open = options[:north_south_open]
     east_west_open   = options[:east_west_open]
 
-    if walls.member?(:north) && passable?(:north, false)
-      if walked_on?
-        north=walked
-      else
-        north=north_south_open || open
-      end
-    else
-      north=wall
-    end
-
-    if walls.member?(:west) && passable?(:west, false)
-      if walked_on?
-        west=walked
-      else
-        west=east_west_open || open
-      end
-    else
-      west=wall
-    end
-
-    north = west = wall = ' ' unless walked_on?
-
-    if highlight?
-      floor=highlight
+    floor = if highlight?
+      highlight
     elsif contents
-      floor=contents[0..0]
+      contents[0..0]
     elsif unvisited?
-      floor=wall
+      wall
     elsif walked_on?
-      floor=walked
+      walked
     else
-      floor=open
+      open
     end
 
-    [ [wall,   north],
-      [west, floor] ]
+    return floor if options[:cell_display_size] == 1
+
+    north, south, east, west = %w(north south east west).collect {|dir| passable?(dir, false) ? floor  : wall }
+    nw, ne, se, sw =           %w(nw ne se sw          ).collect {|dir| options["#{dir}_wall".to_sym] || wall }
+
+    if options[:darkness] && !walked_on?
+      north = south = east = west = nw = ne = se = sw = ' '
+    end
+
+    output =  [ [nw  , north, ne  ],
+                [west, floor, east],
+                [sw  , south, se  ] ]
+
+    return output if options[:cell_display_size] == 3
+
+    output[0...-1].collect {|a| a[0...-1] } # 2x2 output
   end
 
   def walk_on
@@ -273,19 +265,27 @@ class Maze
     end while !list.empty?
   end
 
-  def display
-    wall_char = '#' ; pad = wall_char * (width * 2 + 1)
+  def display options = {}
+    wall_char = options[:wall_char] ||= '#'
     fake = [[wall_char, wall_char], [wall_char, wall_char]]
+    options = options.dup # don't pass our changes back
+    options[:darkness] = false if solved? # show the whole board once solved
+    options[:cell_display_size] ||= 2
+    back_pad   = wall_char                   if (options[:cell_display_size] == 2)
+    display_width = width * options[:cell_display_size] + (back_pad || '').length
+    bottom_pad = (wall_char * display_width) if (options[:cell_display_size] == 2)
+    top_pad    = bottom_pad                  if (options[:cell_display_size] == 3)
+    puts top_pad if top_pad
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell ? cell.display(:wall => wall_char) : fake
+        output = cell ? cell.display(options) : fake
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
-      rows = rows.collect {|row| "#{row.join}#{wall_char}" }
+      rows = rows.collect {|row| "#{row.join}#{back_pad}" }
       puts rows.collect {|row| row }
     }
-    puts pad
+    puts bottom_pad if bottom_pad
     nil
   end
 
@@ -319,10 +319,9 @@ class Maze
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
-      maze.display
+      maze.display options
       puts "Command: "
       command = $stdin.gets.strip
-      options = {:watch => watch, :delay => delay}
       case command
         when /^q/ ; break
         when /^w/ ; watch = !watch ; result = "Watch is #{watch}"
@@ -330,7 +329,9 @@ class Maze
         when /^c/ ; maze.setup_board(:circular => true)
         when /^g/ ; maze.generate(options)
         when /^s/ ; maze.solve(options)
-        when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new $1, $2, options
+        when /^D/ ; options[:darkness] = !options[:darkness]
+        when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new options.merge!({:length => $1, :width => $2})
+        when /^([123])$/ ; options[:cell_display_size] = $1.to_i
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
         when /^([ijkl])/
           next unless maze.highlighted_cell
