@@ -175,7 +175,7 @@ class Maze
 
   def set_highlight cell
     @highlighted_cell.unset_highlight if @highlighted_cell
-    @highlighted_cell = cell
+    return if (@highlighted_cell = cell).nil?
     @highlighted_cell.set_highlight
   end
 
