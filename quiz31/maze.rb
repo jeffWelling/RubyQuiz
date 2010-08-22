@@ -265,6 +265,13 @@ class Maze
     nil
   end
 
+  def solved?
+    @solved ||= begin
+      p [:solved?, highlighted_cell, end_cell]
+      true if highlighted_cell && highlighted_cell == end_cell # only return and nil, so as not to cache a false
+    end
+  end
+
   def self.play maze = nil, options = {}
     options, maze = maze, nil if maze.is_a?(Hash)
     options[:length] ||= 11
@@ -283,9 +290,8 @@ class Maze
         start.walk_on
         finish = nil ; begin ; finish = maze.random_cell ; end while finish == maze.highlighted_cell
         maze.set_end_cell finish
-      elsif maze.generated && maze.highlighted_cell == maze.end_cell
-        puts "Congratulations, you have naviagted the maze"
       end
+      puts "Congratulations, you have naviagted the maze" if maze.solved?
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
