@@ -117,6 +117,8 @@ class Cell
       west=wall
     end
 
+    north = west = wall = ' ' unless walked_on?
+
     if highlight?
       floor=highlight
     elsif contents
