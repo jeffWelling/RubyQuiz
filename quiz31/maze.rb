@@ -143,6 +143,8 @@ class Cell
 end
 
 class Maze
+  attr_reader :board, :length, :width, :highlighted_cell, :generated, :start_cell, :end_cell
+
 	def initialize length, width, options = {}
 		raise "length and width must be fixnums greater than zero" unless [length, width].all? {|n| n.respond_to?(:to_i) && !n.to_i.zero? }
     @length, @width = [length, width].collect {|n| n.to_i }
@@ -177,6 +179,18 @@ class Maze
     @highlighted_cell.unset_highlight if @highlighted_cell
     return if (@highlighted_cell = cell).nil?
     @highlighted_cell.set_highlight
+  end
+
+  def set_start_cell cell
+    start_cell.contents = nil if start_cell
+    return if (@start_cell = cell).nil?
+    start_cell.contents = 'Start'
+  end
+
+  def set_end_cell cell
+    end_cell.contents = nil if end_cell
+    return if (@end_cell = cell).nil?
+    end_cell.contents = 'End'
   end
 
   def random_cell
@@ -248,7 +262,6 @@ class Maze
     puts pad
     nil
   end
-  attr_reader :board, :length, :width, :highlighted_cell, :generated
 
   def self.cli args
     circular = false
@@ -271,13 +284,13 @@ class Maze
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
-      if maze.generated && !maze.highlighted_cell
-        maze.set_highlight maze.random_cell
-        maze.highlighted_cell.contents = 'Start'
-        maze.highlighted_cell.walk_on
-        other = nil ; begin ; other = maze.random_cell ; end while other == maze.highlighted_cell
-        other.contents = 'End'
-      elsif maze.generated && maze.highlighted_cell && maze.highlighted_cell.contents == 'End'
+      if maze.generated && !maze.start_cell && !maze.end_cell
+        maze.set_highlight(start = maze.random_cell)
+        maze.set_start_cell start
+        start.walk_on
+        finish = nil ; begin ; finish = maze.random_cell ; end while finish == maze.highlighted_cell
+        maze.set_end_cell finish
+      elsif maze.generated && maze.highlighted_cell == maze.end_cell
         puts "Congratulations, you have naviagted the maze"
       end
       maze.display
