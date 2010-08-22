@@ -306,7 +306,7 @@ class Maze
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
-      maze.display
+      maze.display options
       puts "Command: "
       command = $stdin.gets.strip
       case command
@@ -317,6 +317,7 @@ class Maze
         when /^g/ ; maze.generate(options)
         when /^s/ ; maze.solve(options)
         when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new options.merge!({:length => $1, :width => $2})
+        when /^([23])$/ ; options[:cell_display_size] = $1.to_i
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
         when /^([ijkl])/
           next unless maze.highlighted_cell
