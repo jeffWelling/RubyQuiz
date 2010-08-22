@@ -98,9 +98,7 @@ class Cell
     east_west_open   = options[:east_west_open]
 
     if walls.member?(:north) && passable?(:north, false)
-      if highlight?
-        north=highlight
-      elsif walked_on?
+      if walked_on?
         north=walked
       else
         north=north_south_open || open
@@ -110,9 +108,7 @@ class Cell
     end
 
     if walls.member?(:west) && passable?(:west, false)
-      if highlight?
-        west=highlight
-      elsif walked_on?
+      if walked_on?
         west=walked
       else
         west=east_west_open || open
