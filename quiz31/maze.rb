@@ -141,10 +141,13 @@ end
 
 class Maze
 	def initialize length, width, options = {}
-    circular = options[:circular]
     @length, @width = length, width
 		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
+    setup_board options
+  end
 
+  def setup_board options = {}
+    circular = options[:circular]
 		@board=[[]]
 		(0...length).each {|l|
 			@board[l] ||=[]
@@ -268,8 +271,8 @@ class Maze
       case command
         when /^q/ ; break
         when /^w/ ; watch = !watch ; result = "Watch is #{watch}"
-        when /^n/ ; maze = Maze.new(len, wid, :circular => false)
-        when /^c/ ; maze = Maze.new(len, wid, :circular => true)
+        when /^n/ ; maze.setup_board(:circular => false)
+        when /^c/ ; maze.setup_board(:circular => true)
         when /^g/ ; maze.generate(options)
         when /^s/ ; maze.solve(options)
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
