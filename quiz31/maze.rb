@@ -141,8 +141,8 @@ end
 
 class Maze
 	def initialize length, width, options = {}
-    @length, @width = length, width
-		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
+		raise "length and width must be fixnums greater than zero" unless [length, width].all? {|n| n.respond_to?(:to_i) && !n.to_i.zero? }
+    @length, @width = [length, width].collect {|n| n.to_i }
     setup_board options
   end
 
