@@ -271,7 +271,15 @@ class Maze
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
-      maze.set_highlight maze.random_cell unless maze.highlighted_cell
+      if maze.generated && !maze.highlighted_cell
+        maze.set_highlight maze.random_cell
+        maze.highlighted_cell.contents = 'Start'
+        maze.highlighted_cell.walk_on
+        other = nil ; begin ; other = maze.random_cell ; end while other == maze.highlighted_cell
+        other.contents = 'End'
+      elsif maze.generated && maze.highlighted_cell && maze.highlighted_cell.contents == 'End'
+        puts "Congratulations, you have naviagted the maze"
+      end
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
