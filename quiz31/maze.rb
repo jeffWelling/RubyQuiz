@@ -282,7 +282,6 @@ class Maze
 
   def solved?
     @solved ||= begin
-      p [:solved?, highlighted_cell, end_cell]
       true if highlighted_cell && highlighted_cell == end_cell # only return and nil, so as not to cache a false
     end
   end
