@@ -272,11 +272,9 @@ class Maze
 
   def self.play maze = nil, options = {}
     options, maze = maze, nil if maze.is_a?(Hash)
-    p [:play1, maze]
     options[:length] ||= 11
     options[:width]  ||= 11
     maze = Maze.new options unless maze
-    p [:play2, maze]
     watch = options[:watch] || true
     delay = options[:delay] || 0.03
 
