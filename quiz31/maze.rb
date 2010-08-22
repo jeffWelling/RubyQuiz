@@ -145,7 +145,8 @@ end
 class Maze
   attr_reader :board, :length, :width, :highlighted_cell, :generated, :start_cell, :end_cell
 
-	def initialize length, width, options = {}
+	def initialize options = {}
+    length, width = options[:length], options[:width]
 		raise "length and width must be fixnums greater than zero" unless [length, width].all? {|n| n.respond_to?(:to_i) && !n.to_i.zero? }
     @length, @width = [length, width].collect {|n| n.to_i }
     setup_board options
