@@ -264,6 +264,7 @@ class Maze
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
+      maze.set_highlight maze.random_cell unless maze.highlighted_cell
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
@@ -278,7 +279,7 @@ class Maze
         when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new $1, $2, options
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
         when /^([ijkl])/
-          maze.set_highlight maze.random_cell unless maze.highlighted_cell
+          maze.highlighted_cell.walk_on
           dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}
           dir = dirs[$1]
           cell = maze.highlighted_cell
