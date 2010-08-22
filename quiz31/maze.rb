@@ -207,6 +207,7 @@ class Maze
   def generate options = {}
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
+    return false if generated
     starting_cell = nil ; begin ; starting_cell = random_cell ; end while !starting_cell.unvisited?
     list = [ starting_cell ]
     begin
