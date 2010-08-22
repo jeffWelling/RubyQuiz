@@ -270,27 +270,20 @@ class Maze
     nil
   end
 
-  def self.cli args
-    circular = false
-    args.each {|arg|
-      next unless arg =~ /^-+([^=]*)(=(.*))?/ # key=val stored in $1 and $3
-      args.delete arg                         # all non-numeric args are parsed and removed
-      key, value = $1, $3
-      case key
-        when /^c(irc(le|ular)?)?$/ ; circular = true
-        else ; puts "Unknown option #{arg} - parsed as #{key.inspect} = #{value.inspect}" ; exit
-      end
-    }
-    len, wid = args.collect(&:to_i)
-    maze = Maze.new len, wid, :circular => circular
-    watch = true ; delay = 0.03
+  def self.play maze = nil, options = {}
+    options, maze = maze, nil if maze.is_a?(Hash)
+    p [:play1, maze]
+    options[:length] ||= 11
+    options[:width]  ||= 11
+    maze = Maze.new options unless maze
+    p [:play2, maze]
+    watch = options[:watch] || true
+    delay = options[:delay] || 0.03
+
     command = nil
     result = nil
     loop do
       print `clear`
-      puts "Last command: #{command}" if command
-      puts result if result
-      result = nil
       if maze.generated && !maze.start_cell && !maze.end_cell
         maze.set_highlight(start = maze.random_cell)
         maze.set_start_cell start
@@ -300,6 +293,9 @@ class Maze
       elsif maze.generated && maze.highlighted_cell == maze.end_cell
         puts "Congratulations, you have naviagted the maze"
       end
+      puts "Last command: #{command}" if command
+      puts result if result
+      result = nil
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
@@ -324,6 +320,21 @@ class Maze
       end
     end
     maze
+  end
+
+  def self.cli args
+    options = {}
+    args.each {|arg|
+      next unless arg =~ /^-+([^=]*)(=(.*))?/ # key=val stored in $1 and $3
+      args.delete arg                         # all non-numeric args are parsed and removed
+      key, value = $1, $3
+      case key
+        when /^c(irc(le|ular)?)?$/ ; options[:circular] = true
+        else ; puts "Unknown option #{arg} - parsed as #{key.inspect} = #{value.inspect}" ; exit
+      end
+    }
+    options[:length], options[:width] = args.collect(&:to_i)
+    play options
   end
 end
 
