@@ -315,7 +315,7 @@ class Maze
           cell = maze.highlighted_cell
           new = cell.neighbors[dir] if cell.passable?(dir,false)
           maze.set_highlight new if new
-          maze.highlighted_cell.walk_on
+          maze.highlighted_cell.walk_on unless maze.solved? # only store footprints while trying to solve the maze
       end
     end
     maze
