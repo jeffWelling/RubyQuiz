@@ -309,7 +309,6 @@ class Maze
       maze.display
       puts "Command: "
       command = $stdin.gets.strip
-      options = {:watch => watch, :delay => delay}
       case command
         when /^q/ ; break
         when /^w/ ; watch = !watch ; result = "Watch is #{watch}"
