@@ -257,11 +257,11 @@ class Maze
   end
 
   def display options = {}
-    wall_char = options[:wall_char] ||= '#'
-    fake = [[wall_char, wall_char], [wall_char, wall_char]]
     options = options.dup # don't pass our changes back
     options[:darkness] = false if solved? # show the whole board once solved
     options[:cell_display_size] ||= 2
+    wall_char = options[:wall_char] ||= '#'
+    fake = [[wall_char, wall_char], [wall_char, wall_char]]
     back_pad   = wall_char                   if (options[:cell_display_size] == 2)
     display_width = width * options[:cell_display_size] + (back_pad || '').length
     bottom_pad = (wall_char * display_width) if (options[:cell_display_size] == 2)
