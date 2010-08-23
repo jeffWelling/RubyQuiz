@@ -98,7 +98,7 @@ class Cell
     east_west_open   = options[:east_west_open]
 
     base_floor = walked_on? ? walked : open
-    floor = (highlight if highlight?) || (contents[0..0] if contents) || base_floor
+    floor = (highlight if highlight?) || (contents[0..0] if contents) || (wall if unvisited?) || base_floor
 
     return floor if options[:cell_display_size] == 1
 
