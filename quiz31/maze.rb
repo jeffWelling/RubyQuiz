@@ -291,6 +291,14 @@ class Maze
     end
   end
 
+  def move dir
+    return false unless cell = highlighted_cell
+    new = cell.neighbors[dir] if cell.passable?(dir,false)
+    return false unless new
+    new.walk_on unless solved? # only store footprints while trying to solve the maze
+    set_highlight new
+  end
+
   def self.play maze = nil, options = {}
     options, maze = maze, nil if maze.is_a?(Hash)
     options[:length] ||= 11
@@ -329,13 +337,7 @@ class Maze
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; options[:delay] = $3.to_f ; result = "Delay is #{options[:delay]}"
         when /^([ijkl])/
           next unless maze.highlighted_cell
-          dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}
-          dir = dirs[$1]
-          cell = maze.highlighted_cell
-          new = cell.neighbors[dir] if cell.passable?(dir,false)
-          next unless new
-          new.walk_on unless maze.solved? # only store footprints while trying to solve the maze
-          maze.set_highlight new if new
+          maze.move dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}[$1]
       end
     end
     maze
