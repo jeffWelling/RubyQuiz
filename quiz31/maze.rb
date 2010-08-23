@@ -65,12 +65,12 @@ class Cell
 		[neighbors, walls].each {|h| h.delete direction }
 	end
 
-  def unvisited?
-    walls.all? {|dir,wall| wall }
+  def visited?
+    walls.any? {|dir,wall| !wall }
   end
 
   def unvisited_neighbors
-    neighbors.select {|dir,cell| cell.unvisited? }
+    neighbors.select {|dir,cell| !cell.visited? }
   end
 
   def not_walked_on_neighbors
@@ -98,7 +98,7 @@ class Cell
     east_west_open   = options[:east_west_open]
 
     base_floor = walked_on? ? walked : open
-    floor = (highlight if highlight?) || (contents[0..0] if contents) || (wall if unvisited?) || base_floor
+    floor = (highlight if highlight?) || (contents[0..0] if contents) || (wall if !visited?) || base_floor
 
     return floor if options[:cell_display_size] == 1
 
@@ -189,7 +189,7 @@ class Maze
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
     return false if generated
-    starting_cell = nil ; begin ; starting_cell = random_cell ; end while !starting_cell.unvisited?
+    starting_cell = nil ; begin ; starting_cell = random_cell ; end while starting_cell.visited?
     list = [ starting_cell ]
     begin
       cell = list.last
@@ -224,7 +224,7 @@ class Maze
           branches_passed += (exits - 2)
         end
       end
-      unreachable += 1 if cell.unvisited? || exits == 0 
+      unreachable += 1 if !cell.visited? || exits == 0
     }
     [num, branches, (num / branches.to_f), walked_on, branches_passed, unreachable]
   end
