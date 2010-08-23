@@ -335,9 +335,7 @@ class Maze
         when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new options.merge!({:length => $1, :width => $2})
         when /^([123])$/ ; options[:cell_display_size] = $1.to_i
         when /^d(elay)?(=|\s?)([0-9.]+)/ ; options[:delay] = $3.to_f ; result = "Delay is #{options[:delay]}"
-        when /^([ijkl])/
-          next unless maze.highlighted_cell
-          maze.move dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}[$1]
+        when /^([ijkl])/ ; maze.move dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}[$1] if maze.highlighted_cell
       end
     end
     maze
