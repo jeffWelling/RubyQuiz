@@ -237,6 +237,7 @@ class Maze
   def solve options = {}
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
+    return false unless generated
     starting_cell = random_cell
     crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
