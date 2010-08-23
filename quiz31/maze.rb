@@ -219,10 +219,8 @@ class Maze
     branches = walked_on = branches_passed = unreachable = 0
     cells.each {|cell|
       exits = cell.walls.select {|d,state| !state }.length
-      if cell.walked_on?
-        walked_on += 1 if cell.walked_on?
-        branches_passed = 1 if branches_passed.zero? && exits > 1
-      end
+      walked_on += 1 if cell.walked_on?
+      branches_passed = (exits - 1) if branches_passed.zero?
       if exits > 2
         branches += (exits - 2)
         if cell.walked_on?
