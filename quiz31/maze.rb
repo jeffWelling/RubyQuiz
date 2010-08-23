@@ -181,15 +181,20 @@ class Maze
 
   def random_cell
     cell = nil
-    begin cell = board[rand(length)][rand(width)] end until cell
-    cell
+    cells = board.flatten.compact
+    loop do
+      return nil unless cell = cells.random
+      cells.delete cell
+      next unless yield(cell) if block_given?
+      return cell
+    end
   end
 
   def generate options = {}
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
     return false if generated
-    starting_cell = nil ; begin ; starting_cell = random_cell ; end while starting_cell.visited?
+    starting_cell = random_cell {|cell| !cell.visited? }
     list = [ starting_cell ]
     begin
       cell = list.last
@@ -299,11 +304,10 @@ class Maze
     loop do
       print `clear`
       if maze.generated && !maze.start_cell && !maze.end_cell
-        maze.set_highlight(start = maze.random_cell)
-        maze.set_start_cell start
-        start.walk_on
-        finish = nil ; begin ; finish = maze.random_cell ; end while finish == maze.highlighted_cell
-        maze.set_end_cell finish
+        maze.set_start_cell maze.random_cell
+        maze.set_end_cell   maze.random_cell {|cell| cell != maze.start_cell }
+        maze.set_highlight  maze.start_cell
+        maze.start_cell.walk_on
       end
       puts "Congratulations, you have naviagted the maze" if maze.solved?
       puts "Last command: #{command}" if command
