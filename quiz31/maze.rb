@@ -291,8 +291,8 @@ class Maze
     options[:length] ||= 11
     options[:width]  ||= 11
     maze = Maze.new options unless maze
-    watch = options[:watch] || true
-    delay = options[:delay] || 0.03
+    options[:watch] ||= true
+    options[:delay] ||= 0.03
 
     command = nil
     result = nil
@@ -314,7 +314,7 @@ class Maze
       command = $stdin.gets.strip
       case command
         when /^q/ ; break
-        when /^w/ ; watch = !watch ; result = "Watch is #{watch}"
+        when /^w/ ; options[:watch] = !options[:watch] ; result = "Watch is #{options[:watch]}"
         when /^n/ ; maze.setup_board(:circular => false)
         when /^c/ ; maze.setup_board(:circular => true)
         when /^g/ ; maze.generate(options)
@@ -322,7 +322,7 @@ class Maze
         when /^D/ ; options[:darkness] = !options[:darkness]
         when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new options.merge!({:length => $1, :width => $2})
         when /^([123])$/ ; options[:cell_display_size] = $1.to_i
-        when /^d(elay)?(=|\s?)([0-9.]+)/ ; delay = $3.to_f ; result = "Delay is #{delay}"
+        when /^d(elay)?(=|\s?)([0-9.]+)/ ; options[:delay] = $3.to_f ; result = "Delay is #{options[:delay]}"
         when /^([ijkl])/
           next unless maze.highlighted_cell
           dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}
