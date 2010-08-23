@@ -11,7 +11,7 @@ class Cell
     @highlight=false
 	end
 
-	attr_reader :neighbors, :walls
+	attr_reader :neighbors, :walls, :highlight
   attr_accessor :contents
 
   def walked_on? ; @walked_on ; end
@@ -90,15 +90,16 @@ class Cell
   end
 
   def display options = {}
-    wall      = options[:wall]      || '#'
-    highlight = options[:highlight] || 'X'
-    walked    = options[:walked]    || '.'
-    open      = options[:open]      || ' '
+    wall             = options[:wall]      || '#'
+    highlight_char   = options[:highlight] || 'X'
+    walked           = options[:walked]    || '.'
+    open             = options[:open]      || ' '
     north_south_open = options[:north_south_open]
     east_west_open   = options[:east_west_open]
+    highlight_char = highlight.to_s[0..0] if highlight? && highlight != true # If it's not simply true, use it
 
     base_floor = walked_on? ? walked : open
-    floor = (highlight if highlight?) || (contents[0..0] if contents) || (wall if !visited?) || base_floor
+    floor = (highlight_char if highlight?) || (contents[0..0] if contents) || (wall if !visited?) || base_floor
 
     return floor if options[:cell_display_size] == 1
 
