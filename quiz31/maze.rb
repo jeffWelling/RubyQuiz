@@ -82,7 +82,7 @@ class Cell
 	end
 
   def to_s
-    "#{neighbors.length} neighbors - #{walls.inspect}"
+    "#{neighbors.length} neighbors - #{walls.inspect}, V:#{visited?}, W:#{walked_on?}, H:#{highlight?}, C:#{contents}"
   end
 
   def inspect
