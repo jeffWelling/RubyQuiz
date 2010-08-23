@@ -193,7 +193,7 @@ class Maze
     list = [ starting_cell ]
     begin
       cell = list.last
-      begin ; print `clear` ; set_highlight cell ; display ; sleep delay ; end if watch
+      begin ; print `clear` ; set_highlight cell ; display options ; sleep delay ; end if watch
       unvisited = cell.unvisited_neighbors
       if unvisited.empty?
         list.pop
@@ -235,7 +235,7 @@ class Maze
     starting_cell = random_cell
     crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
       cell.walk_on
-      begin ; print `clear` ; set_highlight cell ; display ; sleep delay ; end if watch
+      begin ; print `clear` ; set_highlight cell ; display options ; sleep delay ; end if watch
     }
     set_highlight nil if watch
   end 
