@@ -317,7 +317,7 @@ class Maze
         maze.set_highlight  maze.start_cell
         maze.start_cell.walk_on
       end
-      puts "Congratulations, you have naviagted the maze" if maze.solved?
+      puts "Congratulations, you have navigated the maze" if maze.solved?
       puts "Last command: #{command}" if command
       puts result if result
       result = nil
