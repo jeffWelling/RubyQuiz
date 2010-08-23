@@ -23,7 +23,7 @@ class Cell
 	def set_wall direction, state = true, both = true
     direction = direction.to_sym
     neighbors[direction].set_wall reverse_dir(direction), false, state if both
-    @walls[direction] = state
+    walls[direction] = state
 	end
 
 	def unset_wall direction, both = true
@@ -34,7 +34,7 @@ class Cell
     direction = direction.to_sym
     return false unless neighbors[direction]
     return false unless neighbors[direction].passable? reverse_dir(direction), false if both
-    !@walls[direction] # if there isn't a wall, you're free to go
+    !walls[direction] # if there isn't a wall, you're free to go
   end
 
   def reverse_dir direction
@@ -50,8 +50,8 @@ class Cell
     direction = direction.to_sym
     neighbor.add_neighbor direction, self, true unless reverse
     direction = reverse_dir(direction) if reverse
-		@neighbors[direction] = neighbor
-    @walls[direction]     = true
+		neighbors[direction] = neighbor
+    walls[direction]     = true
 	end
 
 	def del_neighbor direction, reverse = false
@@ -59,10 +59,10 @@ class Cell
     if reverse
       direction = reverse_dir(direction)
     else
-      raise "No such neighbor - #{direction} from #{inspect}" unless @neighbors[direction]
-      @neighbors[direction].del_neighbor direction, true
+      raise "No such neighbor - #{direction} from #{inspect}" unless neighbors[direction]
+      neighbors[direction].del_neighbor direction, true
     end
-		[@neighbors, @walls].each {|h| h.delete direction }
+		[neighbors, walls].each {|h| h.delete direction }
 	end
 
   def unvisited?
@@ -78,11 +78,11 @@ class Cell
   end
 
 	def dump
-		[@neighbors,@walls]
+		[neighbors,walls]
 	end
 
   def to_s
-    "#{@neighbors.length} neighbors - #{@walls.inspect}"
+    "#{neighbors.length} neighbors - #{walls.inspect}"
   end
 
   def inspect
