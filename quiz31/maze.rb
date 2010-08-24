@@ -2,6 +2,7 @@
 
 class Array ; def random ; return nil if length.zero? ; entries[rand(length)] ; end ; end
 
+
 class Cell
   
 	def initialize walls=nil
