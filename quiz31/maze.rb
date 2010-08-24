@@ -237,8 +237,9 @@ class Maze
     watch = options[:watch]
     delay = options[:delay].to_f || 0.2
     starting_cell = random_cell
-    crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
+    crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir, distance|
       cell.walk_on
+      cell.set_distance distance
       begin ; print `clear` ; set_highlight cell ; display options ; sleep delay ; end if watch
     }
     set_highlight nil if watch
