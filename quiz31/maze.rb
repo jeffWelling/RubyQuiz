@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 class Array ; def random ; return nil if length.zero? ; entries[rand(length)] ; end ; end
 
 class Cell
@@ -6,14 +8,17 @@ class Cell
 		@walls= {}
 		@neighbors= {}
     @walked_on=false
-    @distance_from_start=nil
+    @highlight=false
 	end
 
-	attr_reader :neighbors, :walls, :walked_on, :distance_from_start
+	attr_reader :neighbors, :walls
+  attr_accessor :contents
 
-  def currently_on_you
-    @@currently_on=self
-  end
+  def walked_on? ; @walked_on ; end
+
+  def set_highlight state = true ; @highlight = state ; end
+  def unset_highlight ; set_highlight false ; end
+  def highlight? ; @highlight ; end
 
   def set_distance distance
     @distance_from_start=distance
@@ -31,7 +36,7 @@ class Cell
 
   def passable? direction, both = false
     direction = direction.to_sym
-    raise "No such neighbor - #{direction} from #{inspect}" unless @neighbors[direction]
+    return false unless neighbors[direction]
     return false unless neighbors[direction].passable? reverse_dir(direction), false if both
     !@walls[direction] # if there isn't a wall, you're free to go
   end
@@ -73,7 +78,7 @@ class Cell
   end
 
   def not_walked_on_neighbors
-    neighbors.select {|dir,cell| self.passable?(dir) and !cell.walked_on }
+    neighbors.select {|dir,cell| self.passable?(dir) and !cell.walked_on? }
   end
 
 	def dump
@@ -88,76 +93,111 @@ class Cell
     "Cell(##{object_id.to_s(16)} #{to_s}"
   end
 
-  def the_current_cell?
-    begin @@currently_on rescue @@currently_on = nil end == self
+  def display options = {}
+    wall      = options[:wall]      || '#'
+    highlight = options[:highlight] || 'X'
+    walked    = options[:walked]    || '.'
+    open      = options[:open]      || ' '
+    north_south_open = options[:north_south_open]
+    east_west_open   = options[:east_west_open]
+
+    base_floor = walked_on? ? walked : open
+    floor = (highlight if highlight?) || (contents[0..0] if contents) || (wall if unvisited?) || base_floor
+
+    return floor if options[:cell_display_size] == 1
+
+    north, south, east, west = %w(north south east west).collect {|dir| passable?(dir, false) ? base_floor  : wall }
+    nw, ne, se, sw =           %w(nw ne se sw          ).collect {|dir| options["#{dir}_wall".to_sym]      || wall }
+
+    if options[:darkness] && !walked_on?
+      north = south = east = west = nw = ne = se = sw = ' '
+    end
+
+    output =  [ [nw  , north, ne  ],
+                [west, floor, east],
+                [sw  , south, se  ] ]
+
+    return output if options[:cell_display_size] == 3
+
+    output[0...-1].collect {|a| a[0...-1] } # 2x2 output
   end
 
-  def display
-    w = '#' # wall character
-    on='X'
-
-    if walls.member?(:north) && passable?(:north, false)
-      if the_current_cell?
-        north=on
-      elsif walked_on==true
-        north='.'
-      else
-        north=' '
-      end
-    else
-      north=w
-    end
-
-    if walls.member?(:west) && passable?(:west, false)
-      if the_current_cell?
-        west=on
-      elsif walked_on==true
-        west='.'
-      else
-        west=' '
-      end
-    else
-      west=w
-    end
-
-    if the_current_cell?
-      c=on
-    elsif walked_on==true
-      c='.'
-    else
-      c=' '
-    end
-
-    [ [w,   north],
-      [west, c] ]
-  end
   def walk_on
     @walked_on=true
   end
 end
 
 class Maze
-	def initialize length, width
-    @length, @width = length, width
-		raise "length and width must be fixnums" unless length.class==Fixnum and width.class==Fixnum
+  attr_reader :board, :length, :width, :highlighted_cell, :generated, :start_cell, :end_cell
 
+	def initialize options = {}
+    length, width = options[:length], options[:width]
+		raise "length and width must be fixnums greater than zero" unless [length, width].all? {|n| n.respond_to?(:to_i) && !n.to_i.zero? }
+    @length, @width = [length, width].collect {|n| n.to_i }
+    setup_board options
+  end
+
+  def wipe_designations
+    @highlighted_cell = @start_cell = @end_cell = @generated = @solved = nil
+  end
+
+  def setup_board options = {}
+    wipe_designations
+    circular = options[:circular]
 		@board=[[]]
 		(0...length).each {|l|
 			@board[l] ||=[]
 			(0...width).each{|w|
+        if circular
+  				@board[l][w]=nil
+          d = ((l - length / 2) ** 2 + (w - width / 2) ** 2)
+          dim = [length, width].min / 2.to_f
+          next unless d < ((    dim / 1) ** 2 - 2)
+          next unless d > ((    dim / 3) ** 2 - 1)
+        end
 				@board[l][w]=cell=Cell.new
-        @board[l-1][w].add_neighbor(:south, cell) unless l == 0
-				@board[l][w-1].add_neighbor(:east,  cell) unless w == 0
+        oc = @board[l-1][w]
+        oc.add_neighbor(:south, cell) unless l == 0 if oc
+				oc = @board[l][w-1]
+        oc.add_neighbor(:east,  cell) unless w == 0 if oc
 			}
 		}
 		@board
 	end
 
-  def generate
-    l, w = rand(length), rand(width)
-    list = [ board[l][w] ]
+  def set_highlight cell
+    @highlighted_cell.unset_highlight if @highlighted_cell
+    return if (@highlighted_cell = cell).nil?
+    @highlighted_cell.set_highlight
+  end
+
+  def set_start_cell cell
+    start_cell.contents = nil if start_cell
+    return if (@start_cell = cell).nil?
+    start_cell.contents = 'Start'
+  end
+
+  def set_end_cell cell
+    end_cell.contents = nil if end_cell
+    return if (@end_cell = cell).nil?
+    end_cell.contents = 'End'
+  end
+
+  def random_cell
+    cell = nil
+    begin cell = board[rand(length)][rand(width)] end until cell
+    cell
+  end
+
+  def generate options = {}
+    watch = options[:watch]
+    delay = options[:delay].to_f || 0.2
+    return false if generated
+    starting_cell = nil ; begin ; starting_cell = random_cell ; end while !starting_cell.unvisited?
+    list = [ starting_cell ]
     begin
       cell = list.last
+      begin ; print `clear` ; set_highlight cell ; display options ; sleep delay ; end if watch
       unvisited = cell.unvisited_neighbors
       if unvisited.empty?
         list.pop
@@ -167,28 +207,45 @@ class Maze
         list << other
       end 
     end while !list.empty?
+    set_highlight nil if watch
+    @generated = true
   end 
 
-  def solve start_cell=nil, end_cell=nil, watch=nil
-    start_cell||=board[0][0]
-    end_cell||=board[-1][-1]
-    crawl( start_cell, 'not_walked_on_neighbors' ) {|cell, dir, distance|
-      cell.walk_on
-      cell.set_distance distance
-      unless watch.nil?
-        puts `clear`
-        cell.currently_on_you
-        display
-        sleep 1
+  def stats
+    return nil unless generated
+    cells = board.flatten.compact
+    num = cells.length
+    branches = walked_on = branches_passed = unreachable = 0
+    cells.each {|cell|
+      exits = cell.walls.select {|d,state| !state }.length
+      if cell.walked_on?
+        walked_on += 1 if cell.walked_on?
+        branches_passed = 1 if branches_passed.zero? && exits > 1
       end
-      #This should return cell if cell is in the bottom right corner of the board
-      return cell if cell==end_cell
+      if exits > 2
+        branches += (exits - 2)
+        if cell.walked_on?
+          branches_passed += (exits - 2)
+        end
+      end
+      unreachable += 1 if cell.unvisited? || exits == 0 
     }
+    [num, branches, (num / branches.to_f), walked_on, branches_passed, unreachable]
+  end
+
+  def solve options = {}
+    watch = options[:watch]
+    delay = options[:delay].to_f || 0.2
+    starting_cell = random_cell
+    crawl( starting_cell, 'not_walked_on_neighbors' ) {|cell, dir|
+      cell.walk_on
+      begin ; print `clear` ; set_highlight cell ; display options ; sleep delay ; end if watch
+    }
+    set_highlight nil if watch
   end 
 
   def crawl(starting_cell, get_neighbors)
-    distnce=0
-    list=[starting_cell]
+    list = [ starting_cell ]
     begin
       cell=list.last
       neighbors= cell.send(get_neighbors.to_sym)
@@ -205,19 +262,102 @@ class Maze
     end while !list.empty?
   end
 
-  def display
-    pad_char = '#' ; pad = pad_char * (width * 2 + 1)
+  def display options = {}
+    options = options.dup # don't pass our changes back
+    options[:darkness] = false if solved? # show the whole board once solved
+    options[:cell_display_size] ||= 2
+    wall_char = options[:wall_char] ||= '#'
+    fake = [[wall_char, wall_char], [wall_char, wall_char]]
+    back_pad   = wall_char                   if (options[:cell_display_size] == 2)
+    display_width = width * options[:cell_display_size] + (back_pad || '').length
+    bottom_pad = (wall_char * display_width) if (options[:cell_display_size] == 2)
+    top_pad    = bottom_pad                  if (options[:cell_display_size] == 3)
+    puts top_pad if top_pad
     board.each {|cells|
       rows = cells.inject([]) {|rows, cell|
-        output = cell.display
+        output = cell ? cell.display(options) : fake
         output.each_with_index {|crow,i| (rows[i] ||= []) << crow }
         rows
       }
-      rows = rows.collect {|row| "#{row.join}#{pad_char}" }
+      rows = rows.collect {|row| "#{row.join}#{back_pad}" }
       puts rows.collect {|row| row }
     }
-    puts pad
+    puts bottom_pad if bottom_pad
     nil
   end
-  attr_reader :board, :length, :width
+
+  def solved?
+    @solved ||= begin
+      true if highlighted_cell && highlighted_cell == end_cell # only return and nil, so as not to cache a false
+    end
+  end
+
+  def self.play maze = nil, options = {}
+    options, maze = maze, nil if maze.is_a?(Hash)
+    options[:length] ||= 11
+    options[:width]  ||= 11
+    maze = Maze.new options unless maze
+    options[:watch] ||= true
+    options[:delay] ||= 0.03
+
+    command = nil
+    result = nil
+    loop do
+      print `clear`
+      if maze.generated && !maze.start_cell && !maze.end_cell
+        maze.set_highlight(start = maze.random_cell)
+        maze.set_start_cell start
+        start.walk_on
+        finish = nil ; begin ; finish = maze.random_cell ; end while finish == maze.highlighted_cell
+        maze.set_end_cell finish
+      end
+      puts "Congratulations, you have naviagted the maze" if maze.solved?
+      puts "Last command: #{command}" if command
+      puts result if result
+      result = nil
+      maze.display options
+      puts "Command: "
+      command = $stdin.gets.strip
+      case command
+        when /^q/ ; break
+        when /^w/ ; options[:watch] = !options[:watch] ; result = "Watch is #{options[:watch]}"
+        when /^n/ ; maze.setup_board(:circular => false)
+        when /^c/ ; maze.setup_board(:circular => true)
+        when /^g/ ; maze.generate(options)
+        when /^s/ ; maze.solve(options)
+        when /^D/ ; options[:darkness] = !options[:darkness]
+        when /^(\d+)\s?,\s?(\d+)$/ ; maze = Maze.new options.merge!({:length => $1, :width => $2})
+        when /^([123])$/ ; options[:cell_display_size] = $1.to_i
+        when /^d(elay)?(=|\s?)([0-9.]+)/ ; options[:delay] = $3.to_f ; result = "Delay is #{options[:delay]}"
+        when /^([ijkl])/
+          next unless maze.highlighted_cell
+          dirs = {'i' => :north, 'j' => :west, 'k' => :south, 'l' => :east}
+          dir = dirs[$1]
+          cell = maze.highlighted_cell
+          new = cell.neighbors[dir] if cell.passable?(dir,false)
+          new.walk_on unless maze.solved? # only store footprints while trying to solve the maze
+          maze.set_highlight new if new
+      end
+    end
+    maze
+  end
+
+  def self.cli args
+    options = {}
+    args.each {|arg|
+      next unless arg =~ /^-+([^=]*)(=(.*))?/ # key=val stored in $1 and $3
+      args.delete arg                         # all non-numeric args are parsed and removed
+      key, value = $1, $3
+      case key
+        when /^c(irc(le|ular)?)?$/ ; options[:circular] = true
+        else ; puts "Unknown option #{arg} - parsed as #{key.inspect} = #{value.inspect}" ; exit
+      end
+    }
+    options[:length], options[:width] = args.collect(&:to_i)
+    play options
+  end
+end
+
+if $0 == __FILE__
+  Maze.cli ARGV
 end
