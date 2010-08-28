@@ -253,21 +253,33 @@ class Maze
   def show_direct_route options={}
     raise "Must solve() maze first" unless solved?
     start_cell= options[:start_cell] || random_cell
-    end_cel=    options[:end_cell]   || random_cell
-    
-    add current cell to start_stack
-    get passable neighbor with lowest distance
-    repeat until distance == 0
+    end_cell=    options[:end_cell]  || random_cell
+    start_stack=end_stack= []
+    distance=0    
 
-    add current cell to end_stack
-    get passable neighbor with lowest distance
-    repeat until distance == 0
+    until distance==0 do
+      start_stack<< current_cell
+      current_cell=current_cell.neighbors.select {|dir, cell|
+        current_cell.passable?(dir) and cell.distance == distance-1
+      }[0].to_a[1]
+    end
 
-    reverse start_stack and end_stack
-    start_stack.collect {|cell| cell unless end_stack.include? cell }
+    current_cell=end_cell
+    distance=current_cell.distance
+    until distance==0 do
+      end_stack<< current_cell
+      current_cell=current_cell.neighbors.select {|dir, cell|
+        current_cell.passable?(dir) and cell.distance == distance-1
+      }[0].to_a[1]
+    end
+ 
+    start_stack=start_stack.reverse.delete_if {|cell|
+      end_stack.include? cell }
+    end_stack=end_stack.reverse.delete_if {|cell|
+      end_stack.include? cell }
 
-    start_stack.each {|cell| cell.highlight }
-    end_stack.each   {|cell| cell.highlight }
+    start_stack.each {|cell| cell.set_highlight }
+    end_stack.each   {|cell| cell.set_highlight }
     display
   end
 
