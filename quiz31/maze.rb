@@ -245,10 +245,6 @@ class Maze
     set_highlight nil if watch
   end 
 
-  def solved?
-    random_cell.walked_on?
-  end
- 
   #options[] keys; :start_cell, :end_cell
   def show_direct_route options={}
     raise "Must solve() maze first" unless solved?
@@ -324,6 +320,14 @@ class Maze
     }
     puts bottom_pad if bottom_pad
     nil
+  end
+
+  #I expected solved?() to return true or false depending on if the maze was
+  #solved or not, but it bahaves differently, so I wrote my own method for it.
+  def is_solved?
+    #This works based on the assumption that solve() has been run and that it
+    #walks on each cell in the process.
+    random_cell.walked_on?
   end
 
   def solved?
