@@ -245,6 +245,10 @@ class Maze
     set_highlight nil if watch
   end 
 
+  def solved?
+    random_cell.walked_on?
+  end
+
   def crawl(starting_cell, get_neighbors)
     list = [ starting_cell ]
     begin
