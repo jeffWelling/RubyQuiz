@@ -9,9 +9,10 @@ class Cell
 		@neighbors= {}
     @walked_on=false
     @highlight=false
+    @distance=nil
 	end
 
-	attr_reader :neighbors, :walls
+	attr_reader :neighbors, :walls, :distance
   attr_accessor :contents
 
   def walked_on? ; @walked_on ; end
@@ -21,7 +22,7 @@ class Cell
   def highlight? ; @highlight ; end
 
   def set_distance distance
-    @distance_from_start=distance
+    @distance=distance
   end
 
 	def set_wall direction, state = true, both = true
