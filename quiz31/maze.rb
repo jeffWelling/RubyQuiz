@@ -247,7 +247,7 @@ class Maze
 
   #options[] keys; :start_cell, :end_cell
   def show_direct_route options={}
-    raise "Must solve() maze first" unless solved?
+    raise "Must solve() maze first" unless is_solved?
     start_cell= options[:start_cell] || random_cell
     end_cell=    options[:end_cell]  || random_cell
     start_stack=end_stack= []
