@@ -284,6 +284,7 @@ class Maze
   end
 
   def crawl(starting_cell, get_neighbors)
+    distance=0
     list = [ starting_cell ]
     begin
       cell=list.last
