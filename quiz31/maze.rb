@@ -248,6 +248,28 @@ class Maze
   def solved?
     random_cell.walked_on?
   end
+ 
+  #options[] keys; :start_cell, :end_cell
+  def show_direct_route options={}
+    raise "Must solve() maze first" unless solved?
+    start_cell= options[:start_cell] || random_cell
+    end_cel=    options[:end_cell]   || random_cell
+    
+    add current cell to start_stack
+    get passable neighbor with lowest distance
+    repeat until distance == 0
+
+    add current cell to end_stack
+    get passable neighbor with lowest distance
+    repeat until distance == 0
+
+    reverse start_stack and end_stack
+    start_stack.collect {|cell| cell unless end_stack.include? cell }
+
+    start_stack.each {|cell| cell.highlight }
+    end_stack.each   {|cell| cell.highlight }
+    display
+  end
 
   def crawl(starting_cell, get_neighbors)
     list = [ starting_cell ]
