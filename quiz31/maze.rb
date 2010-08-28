@@ -166,6 +166,14 @@ class Maze
 		@board
 	end
 
+  def unhighlight_all
+    board.each_index {|l|
+      board[l].each_index {|w|
+        board[l][w].set_highlight false
+      }
+    }
+  end
+
   def set_highlight cell
     @highlighted_cell.unset_highlight if @highlighted_cell
     return if (@highlighted_cell = cell).nil?
@@ -248,17 +256,21 @@ class Maze
 
   #options[] keys; :start_cell, :end_cell
   def show_direct_route options={}
+    require 'pp'
     raise "Must solve() maze first" unless is_solved?
-    start_cell= options[:start_cell] || random_cell
-    end_cell=    options[:end_cell]  || random_cell
+    start_cell= current_cell= options[:start_cell] || random_cell
+    end_cell=                 options[:end_cell]   || random_cell
     start_stack=end_stack= []
-    distance=0    
+    unhighlight_all
 
+    distance=current_cell.distance
     until distance==0 do
       start_stack<< current_cell
-      current_cell=current_cell.neighbors.select {|dir, cell|
-        current_cell.passable?(dir) and cell.distance == distance-1
-      }[0].to_a[1]
+      temp=current_cell.neighbors.select {|dir, cell|
+        cell.distance == distance-1
+      }[0][1]
+      distance-=1
+      current_cell=temp
     end
 
     current_cell=end_cell
@@ -266,8 +278,9 @@ class Maze
     until distance==0 do
       end_stack<< current_cell
       current_cell=current_cell.neighbors.select {|dir, cell|
-        current_cell.passable?(dir) and cell.distance == distance-1
-      }[0].to_a[1]
+        cell.distance == distance-1
+      }[0][1]
+      distance-=1
     end
  
     start_stack=start_stack.reverse.delete_if {|cell|
